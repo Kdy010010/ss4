@@ -250,10 +250,11 @@ const lines = [
 ];
 
 const el=document.getElementById("type");
-let i=0, t=lines.join("\\n");
+let i=0, t=lines.join("\n");
 (function type(){
   el.textContent=t.slice(0,++i);
-  if(i<t.length) setTimeout(type, t[i]==="\\n"?18:22);
+  if(i<t.length) setTimeout(type, t[i]==="\n"?18:22);
+
 })();
 
 function nav(e,href){
