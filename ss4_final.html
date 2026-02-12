@@ -1,0 +1,3060 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>StarShield 4: Constantinople Front</title>
+<style>
+  :root{
+    --bg1:#050014; --accent:#4af2c5; --danger:#ff4b81; --warn:#ffd166;
+    --text:#f4f8ff; --sub:#a6b0ff;
+    --panel:rgba(10,14,40,.92);
+    --panel2:rgba(8,12,34,.88);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  body{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at top,#16193b 0,#050014 60%);
+    color:var(--text);
+  }
+  .wrap{
+    width:min(1320px,100vw - 16px);
+    padding:14px 12px 16px;
+    background:linear-gradient(145deg,rgba(10,12,40,.95),rgba(6,9,30,.95));
+    border-radius:16px;border:1px solid rgba(90,120,255,.35);
+    box-shadow:0 0 40px rgba(0,0,0,.9),0 0 24px rgba(61,214,255,.3);
+    backdrop-filter:blur(12px)
+  }
+  .header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .title{font-size:22px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+  .title span{font-size:13px;font-weight:500;color:var(--sub);text-transform:none;letter-spacing:0}
+  .badge{padding:3px 10px;border-radius:999px;border:1px solid rgba(74,242,197,.6);color:var(--accent);font-size:11px;text-transform:uppercase;white-space:nowrap}
+
+  .top{
+    display:grid;
+    grid-template-columns:repeat(7,minmax(0,1fr)) auto;
+    gap:6px;align-items:center;margin-bottom:8px
+  }
+  .stat{background:var(--panel);border-radius:10px;padding:6px 8px;border:1px solid rgba(80,110,255,.45);min-width:0}
+  .lab{font-size:10px;text-transform:uppercase;color:var(--sub);letter-spacing:.08em;white-space:nowrap}
+  .val{margin-top:2px;font-size:16px;font-weight:900}
+  .valSmall{margin-top:2px;font-size:12px;color:var(--sub);white-space:nowrap}
+  .btn{
+    background:radial-gradient(circle at top,#49f2c3,#18a3ff);
+    border-radius:999px;padding:8px 14px;border:none;color:#02020c;
+    font-size:11px;font-weight:950;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+    box-shadow:0 0 16px rgba(74,242,197,.6),0 0 8px rgba(24,163,255,.6);
+    display:inline-flex;align-items:center;gap:6px;white-space:nowrap
+  }
+  .btn.secondary{background:rgba(12,18,50,.92);color:var(--text);border:1px solid rgba(110,144,255,.5);box-shadow:none}
+  .btn.danger{background:rgba(255,75,129,.12); color:#ffdbe8; border:1px solid rgba(255,75,129,.5); box-shadow:none}
+  .btn.good{background:rgba(74,242,197,.12); color:#d8fff3; border:1px solid rgba(74,242,197,.5); box-shadow:none}
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .btnToggle{
+    border-radius:999px;padding:10px 14px;
+    border:1px solid rgba(110,144,255,.5);
+    background:rgba(12,18,50,.92);
+    color:var(--text);
+    font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  }
+  .btnToggle.on{
+    border-color:rgba(74,242,197,.8);
+    box-shadow:0 0 12px rgba(74,242,197,.35);
+    color:#d8fff3;
+  }
+
+  .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  select{
+    background:rgba(12,18,50,.92);
+    border:1px solid rgba(110,144,255,.5);
+    color:var(--text);border-radius:10px;padding:7px 10px;font-size:12px
+  }
+  .chip{
+    background:rgba(12,18,50,.92);
+    border:1px solid rgba(110,144,255,.5);
+    border-radius:10px;padding:7px 10px;font-size:12px;
+    display:flex;gap:8px;align-items:center
+  }
+  .chip b{color:var(--accent)}
+  #game{
+    display:block;width:100%;
+    height:min(70vh, 720px);
+    border-radius:14px;border:1px solid rgba(80,110,255,.8);
+    box-shadow:0 0 18px rgba(74,242,197,.65);
+    background:radial-gradient(circle at top,#141742 0,#030310 70%);
+    touch-action:none;
+  }
+
+  .bars{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .barTitle{color:var(--sub);font-size:12px;letter-spacing:.04em;margin:2px 0 6px 2px}
+  .gridCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .card{
+    background:var(--panel);
+    border-radius:12px;padding:8px 10px;border:1px solid rgba(80,110,255,.5);
+    cursor:pointer;position:relative;overflow:hidden
+  }
+  .card:hover{box-shadow:0 0 12px rgba(74,242,197,.25)}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 14px rgba(74,242,197,.45)}
+  .cardTop{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px}
+  .name{font-size:13px;font-weight:900}
+  .key{font-size:10px;padding:1px 7px;border-radius:999px;border:1px solid rgba(180,196,255,.85);color:var(--sub)}
+  .cost{font-size:12px;color:var(--accent);margin-bottom:4px}
+  .desc{font-size:11px;color:var(--sub);line-height:1.25}
+
+  .bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;color:var(--sub);font-size:11px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pill{padding:4px 8px;border-radius:999px;background:rgba(12,18,50,.9);border:1px solid rgba(110,144,255,.5);font-size:10px}
+  .kbd{padding:1px 6px;border-radius:4px;border:1px solid rgba(180,196,255,.8);font-size:9px;margin-right:4px}
+  .status{min-height:16px;text-align:right;flex:1}
+  .goodText{color:var(--accent)}
+  .badText{color:var(--danger)}
+  .warnText{color:var(--warn)}
+
+  .modalBack{
+    position:fixed; inset:0; background:rgba(0,0,0,.65);
+    display:none; align-items:center; justify-content:center; padding:16px;
+    z-index:50;
+  }
+  .modal{
+    width:min(860px, 100%);
+    background:linear-gradient(145deg, rgba(8,12,34,.96), rgba(6,8,24,.96));
+    border:1px solid rgba(110,144,255,.55);
+    border-radius:16px;
+    box-shadow:0 0 28px rgba(0,0,0,.85), 0 0 18px rgba(74,242,197,.25);
+    padding:14px 14px 12px;
+  }
+  .modal h2{font-size:18px; letter-spacing:.04em; margin-bottom:6px}
+  .modal .sub{color:var(--sub); font-size:12px; margin-bottom:10px}
+  .modal .text{
+    background:rgba(10,14,40,.55);
+    border:1px solid rgba(80,110,255,.35);
+    border-radius:12px;
+    padding:10px 12px;
+    line-height:1.5;
+    font-size:13px;
+    color:#eaf0ff;
+    white-space:pre-wrap;
+    margin-bottom:10px;
+  }
+  .modal .row2{display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .tag{
+    display:inline-flex; gap:8px; align-items:center;
+    padding:4px 10px; border-radius:999px;
+    border:1px solid rgba(180,196,255,.55);
+    background:rgba(12,18,50,.55);
+    color:var(--sub); font-size:11px;
+  }
+  .tag b{color:var(--accent)}
+  .miniHelp{color:var(--sub); font-size:11px}
+
+  @media (max-width: 980px){
+    .top{grid-template-columns:repeat(3,minmax(0,1fr)) auto}
+    .bars{grid-template-columns:1fr}
+    .gridCards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .btn{padding:10px 14px}
+    .chip{padding:9px 10px}
+  }
+
+.frontlineStat{min-width:160px}
+.frontBar{height:8px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}
+#frontlineBar{height:100%;width:50%;background:linear-gradient(90deg, rgba(255,75,129,.95), rgba(74,242,197,.95))}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="title">
+      StarShield3: 철과 십자
+      <span>미합중국 달원정군(플레이어) vs 제4제국 달군(NAZI) · 달 앞면 전역</span>
+    </div>
+    <div class="badge">PC · Tablet · Phone</div>
+  </div>
+
+  <div class="top">
+    <div class="stat"><div class="lab">Episode</div><div class="val" id="epDisp">1</div></div>
+    <div class="stat"><div class="lab">Map</div><div class="valSmall" id="mapName">-</div></div>
+    <div class="stat"><div class="lab">Wave</div><div class="val" id="waveDisp">0</div></div>
+    <div class="stat"><div class="lab">Life</div><div class="val" id="lifeDisp">20</div></div>
+    <div class="stat"><div class="lab">Energy</div><div class="val" id="energyDisp">500</div></div>
+<div class="stat frontlineStat">
+  <div class="lab">Frontline</div>
+  <div class="valSmall"><span id="frontlineDisp">50%</span></div>
+  <div class="frontBar"><div id="frontlineBar"></div></div>
+</div>
+    <div class="stat"><div class="lab">Enemy Core</div><div class="valSmall" id="coreDisp">-</div></div>
+    <div class="stat"><div class="lab">Units / Enemies</div><div class="valSmall" id="countsDisp">-</div></div>
+    <button class="btn" id="startWaveBtn">▶ 웨이브 시작</button>
+  </div>
+
+  <div class="row">
+    <div class="chip">에피소드/맵:
+      <select id="mapSelect"></select>
+    </div>
+
+    <button class="btn secondary" id="storyBtn">📜 스토리</button>
+    <button class="btn secondary" id="restartBtn">R 재시작</button>
+
+    <button class="btnToggle on" id="modeTowerBtn">🛠️ 설치 모드</button>
+    <button class="btnToggle" id="modeUnitBtn">🚀 소환 모드</button>
+
+    <button class="btn good" id="spawnBtn">+ 소환(버튼)</button>
+
+    <div class="chip" id="selInfo">
+      <span>타워: <b id="selTowerName">-</b></span>
+      <span>유닛: <b id="selUnitName">-</b></span>
+    </div>
+  </div>
+
+  <canvas id="game"></canvas>
+
+  <div class="bars">
+    <div>
+      <div class="barTitle">🛡️ 타워 선택 (설치 모드에서 탭 / 1~9)</div>
+      <div class="gridCards" id="towerBar"></div>
+    </div>
+    <div>
+      <div class="barTitle">⚔️ 유닛 선택 (소환 모드에서 탭 또는 +소환 / Z X C V B N M)</div>
+      <div class="gridCards" id="unitBar"></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="pills">
+      <div class="pill"><span class="kbd">설치/소환</span> 모드 버튼으로 전환(모바일 최적)</div>
+      <div class="pill"><span class="kbd">+소환</span> 웨이브 중에만 가능(기본: 내 기지 근처)</div>
+      <div class="pill"><span class="kbd">드래그</span> 화면 이동(패닝)</div>
+      <div class="pill"><span class="kbd">휠/핀치</span> 확대/축소</div>
+      <div class="pill"><span class="kbd">R</span> 재시작</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+
+<div class="modalBack" id="modalBack">
+  <div class="modal">
+    <h2 id="storyTitle">-</h2>
+    <div class="sub" id="storySub">-</div>
+    <div class="text" id="storyText"></div>
+    <div class="row2">
+      <span class="tag">목표: <b id="storyGoal">-</b></span>
+      <span class="miniHelp">Tip: 웨이브 중 +소환으로 쉽고 빠르게 러시</span>
+      <button class="btn" id="closeStoryBtn">계속</button>
+    </div>
+  </div>
+</div>
+
+<!-- Epilogue / Fade -->
+<div id="fadeOverlay" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .6s ease;z-index:80"></div>
+<div class="modalBack" id="epilogueBack" style="z-index:90;">
+  <div class="modal">
+    <h2>작전 종료</h2>
+    <div class="sub">MVBDH-1927495 전역 확보 · 요새 ‘콘스탄티노플’ 무력화</div>
+    <div class="text">모든 전역을 클리어했습니다.
+
+사이비 집단은 토착 벌레 군체와 인간을 ‘진화’시켜 생체 병기화했고, 요새 콘스탄티노플은 그 진화 촉진 장치였습니다.
+당신의 침공은 전선을 밀어 올려 그 네트워크를 붕괴시켰습니다.
+
+— 에필로그(EP)에서 작전 보고를 확인하세요.</div>
+    <div class="row2">
+      <span class="tag">다음: <b>EPILOGUE</b></span>
+      <span class="miniHelp">버튼을 누르면 화면이 어두워지며 이동합니다.</span>
+      <button class="btn" id="epilogueBtn">에필로그 보기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   StarShield4: Constantinople Front (single file)
+   - fetch(JSON)로 로딩 (blobURL)
+   - 맵 18 (에피소드 6, 각 3맵)
+   - 적 타워: 적 코어 근처만 설치 + 공격/방어 AI
+   - 아군 유닛: 적 타워/적/코어 공격 가능
+   - 유닛 소환: 웨이브 중에만 가능 (+소환 버튼 / 소환 모드 탭)
+   - 타키온 타워(5000 에너지) 추가
+   - EP6 블랙홀 궤도전: 후반 "Reich Carrier"만 나오게
+   ========================================================= */
+function blobURL(obj){
+  return URL.createObjectURL(new Blob([JSON.stringify(obj)], {type:"application/json"}));
+}
+
+/* ============ DATA (TOWERS / ENEMY TOWERS / UNITS / ENEMIES) ============ */
+const EMBED_TOWERS = [
+  { id:"laser",   name:"레이저 타워", hotkey:"1", cost:60,  baseRange:170, fireRate:30, baseDamage:12, bulletSpeed:9.3, splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:80,  desc:"기본 DPS. 초반 안정적." },
+  { id:"rail",    name:"레일건 타워", hotkey:"2", cost:110, baseRange:285, fireRate:68, baseDamage:42, bulletSpeed:13.5, splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:105, desc:"초장거리 저격. 엘리트/보스." },
+  { id:"missile", name:"미사일 타워", hotkey:"3", cost:140, baseRange:195, fireRate:54, baseDamage:20, bulletSpeed:7.8, splashRadius:72, slowFactor:1,   slowDuration:0,   mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:120, desc:"범위 폭발. 무리 처치." },
+  { id:"slow",    name:"슬로우 타워", hotkey:"4", cost:95,  baseRange:170, fireRate:58, baseDamage:6,  bulletSpeed:8.0, splashRadius:52, slowFactor:0.50,slowDuration:95,  mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:105, desc:"이동 속도 크게 감소." },
+  { id:"pulse",   name:"펄스 타워",   hotkey:"5", cost:165, baseRange:150, fireRate:70, baseDamage:26, bulletSpeed:0,   splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"pulse",  poisonDps:0,    poisonDuration:0,    baseHp:135, desc:"근거리 광역 펄스." },
+  { id:"poison",  name:"포이즌 타워", hotkey:"6", cost:130, baseRange:175, fireRate:44, baseDamage:7,  bulletSpeed:8.7, splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"bullet", poisonDps:0.55, poisonDuration:150,  baseHp:95,  desc:"독 지속 피해(체력 비례식 아님)." },
+  { id:"heal",    name:"리페어 타워", hotkey:"7", cost:160, baseRange:140, fireRate:75, baseDamage:0,  bulletSpeed:0,   splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"heal",   poisonDps:0,    poisonDuration:0,    baseHp:105, healAmount:6, desc:"주변 타워 수리." },
+  { id:"aa",      name:"AA 스피어",   hotkey:"8", cost:190, baseRange:220, fireRate:40, baseDamage:18, bulletSpeed:15.5, splashRadius:0,  slowFactor:1,   slowDuration:0,   mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:125, desc:"빠른 탄속. 원거리 유닛/스웜." },
+  { id:"tachyon", name:"타키온 타워", hotkey:"9", cost:5000,baseRange:520, fireRate:18, baseDamage:320,bulletSpeed:20.0, splashRadius:110,slowFactor:0.72,slowDuration:45,  mode:"bullet", poisonDps:0,    poisonDuration:0,    baseHp:260, desc:"5000⚡. 대부분 적 2방컷급(후반용)." }
+];
+
+// 적 타워(RED) - 코어 근처에만 배치(자동/AI)
+const EMBED_ENEMY_TOWERS = [
+  { id:"r_laser",   name:"RED 레이저 포스트", cost:120, range:190, fireRate:38, damage:10, bulletSpeed:9.0, splashRadius:0,  hp:130, mode:"bullet" },
+  { id:"r_mortar",  name:"RED 박격포",        cost:170, range:240, fireRate:70, damage:16, bulletSpeed:7.0, splashRadius:90, hp:150, mode:"bullet" },
+  { id:"r_sniper",  name:"RED 스나이퍼 릴레이",cost:220,range:320, fireRate:84, damage:26, bulletSpeed:14.0,splashRadius:0,  hp:120, mode:"bullet" },
+  { id:"r_field",   name:"RED 감속장",        cost:200, range:200, fireRate:62, damage:5,  bulletSpeed:8.0, splashRadius:62, hp:160, mode:"bullet", slowFactor:0.55, slowDuration:90 },
+  { id:"r_burst",   name:"RED 버스트 코일",    cost:260, range:160, fireRate:75, damage:22, bulletSpeed:0,   splashRadius:0,  hp:175, mode:"pulse" }
+];
+
+const EMBED_ENEMIES = {
+  // SS4: MVBDH-1927495 · Fortress "Constantinople" (rounded, bio-evolved enemies)
+  // Aliases kept for SS3 wave scripts: normal/fast/tank/.../boss
+  drone:      { name:"Drone",            color:"#ff62c9", hpFactor:1.00, speedBase:1.10, speedGrow:0.06, atkRange:140, atkRate:72, atkDamage:6 },
+  striker:    { name:"Striker",          color:"#6af7ff", hpFactor:0.85, speedBase:1.95, speedGrow:0.08, atkRange:140, atkRate:58, atkDamage:5 },
+  juggernaut: { name:"Juggernaut",       color:"#ffb347", hpFactor:2.60, speedBase:0.78, speedGrow:0.04, atkRange:155, atkRate:85, atkDamage:13 },
+  swarm:      { name:"Guided Swarm",     color:"#c6ff7a", hpFactor:0.60, speedBase:1.55, speedGrow:0.07, atkRange:110, atkRate:52, atkDamage:3 },
+  pressure:   { name:"Pressure Unit",    color:"#ffd07a", hpFactor:1.30, speedBase:1.00, speedGrow:0.05, atkRange:160, atkRate:66, atkDamage:8 },
+
+  shield:     { name:"Shield Unit",      color:"#a38bff", hpFactor:1.80, speedBase:1.05, speedGrow:0.05, atkRange:150, atkRate:76, atkDamage:7 },
+  regen:      { name:"Regenerator",      color:"#7cf9c2", hpFactor:1.55, speedBase:1.05, speedGrow:0.05, atkRange:145, atkRate:70, atkDamage:6, regenFactor:0.03 },
+  sniper:     { name:"Sniper",           color:"#90caf9", hpFactor:0.78, speedBase:1.25, speedGrow:0.05, atkRange:280, atkRate:70, atkDamage:10 },
+  bomber:     { name:"Bomber",           color:"#ff867c", hpFactor:1.75, speedBase:1.00, speedGrow:0.05, atkRange:165, atkRate:74, atkDamage:11 },
+  brute:      { name:"Brute",            color:"#ffab91", hpFactor:2.95, speedBase:0.92, speedGrow:0.05, atkRange:150, atkRate:78, atkDamage:14 },
+  medic:      { name:"Medic",            color:"#80cbc4", hpFactor:1.45, speedBase:1.15, speedGrow:0.05, atkRange:140, atkRate:78, atkDamage:4,
+                healRadius:170, healFactor:0.08, healInterval:45 },
+
+  // bio-evolution branch
+  larva:      { name:"Larva",            color:"#b6ffb6", hpFactor:0.55, speedBase:2.10, speedGrow:0.09, atkRange:90,  atkRate:50, atkDamage:3 },
+  bulb:       { name:"Bulb Walker",      color:"#a6ffcf", hpFactor:2.80, speedBase:0.75, speedGrow:0.04, atkRange:120, atkRate:85, atkDamage:10 },
+  cluster:    { name:"Cluster",          color:"#c7fffa", hpFactor:1.20, speedBase:1.10, speedGrow:0.06, atkRange:120, atkRate:70, atkDamage:6 },
+  spitter:    { name:"Spitter",          color:"#9ee6ff", hpFactor:0.95, speedBase:1.25, speedGrow:0.06, atkRange:210, atkRate:62, atkDamage:7 },
+  mut_marine: { name:"Mutated Marine",   color:"#d9b6ff", hpFactor:1.05, speedBase:1.15, speedGrow:0.05, atkRange:190, atkRate:48, atkDamage:9 },
+
+  // boss
+  carrier:    { name:"Carrier (BOSS)",   color:"#ff3b6b", hpFactor:9.50, speedBase:0.62, speedGrow:0.05, atkRange:220, atkRate:62, atkDamage:18 },
+
+  // SS3 compatibility aliases (wave scripts may still use these)
+  normal: { alias:"drone" },
+  fast:   { alias:"striker" },
+  tank:   { alias:"juggernaut" },
+  boss:   { alias:"carrier" }
+};
+
+const EMBED_UNITS = [
+  { id:"fighter",  name:"파이터(근접)",  hotkey:"Z", cost:55,  hp:90,  speed:1.95, range:34,  atkRate:24, damage:9,  mode:"melee",  coreStrikes:7, desc:"돌격. 적/적타워에 붙어서 난타." },
+  { id:"rifle",    name:"라이플(원거리)",hotkey:"X", cost:78,  hp:78,  speed:1.60, range:175, atkRate:30, damage:11, mode:"ranged", bulletSpeed:12.2, coreStrikes:6, desc:"안정적 DPS. 적타워도 제거." },
+  { id:"sniperU",  name:"스나이퍼",      hotkey:"C", cost:125, hp:62,  speed:1.40, range:310, atkRate:58, damage:30, mode:"ranged", bulletSpeed:15.2, coreStrikes:5, desc:"초장거리. 코어/적타워에 강함." },
+  { id:"bomberU",  name:"폭격드론",      hotkey:"V", cost:150, hp:92,  speed:1.35, range:190, atkRate:54, damage:15, mode:"splash", bulletSpeed:9.8, splashRadius:78, coreStrikes:6, desc:"범위 폭발. 스웜/타워 주변 청소." },
+  { id:"medicU",   name:"메딕(지원)",    hotkey:"B", cost:110, hp:84,  speed:1.55, range:170, atkRate:50, damage:0,  mode:"heal", healAmount:7, coreStrikes:0, desc:"주변 아군 회복. 러시 유지." },
+  { id:"guardian", name:"가디언(탱커)",  hotkey:"N", cost:210, hp:260, speed:1.05, range:60,  atkRate:36, damage:12, mode:"melee", coreStrikes:8, desc:"두꺼운 전열. 적 타워 어그로." },
+  { id:"emp",      name:"EMP 해커",      hotkey:"M", cost:230, hp:90,  speed:1.35, range:220, atkRate:66, damage:9,  mode:"emp", bulletSpeed:11.0, empSlow:0.55, empDur:85, coreStrikes:4, desc:"맞춘 적/적타워를 둔화+공격속도 저하." }
+,
+  { id:"droneU",     name:"드론(기본)",      hotkey:"", cost:45,  hp:80,  speed:1.55, range:150, atkRate:38, damage:6,  mode:"shoot", bulletSpeed:10.0, coreStrikes:4, desc:"기본 표준 유닛. 저렴하고 안정적." },
+  { id:"marineU",    name:"해병",            hotkey:"", cost:85,  hp:120, speed:1.55, range:165, atkRate:34, damage:8,  mode:"shoot", bulletSpeed:11.0, coreStrikes:5, desc:"근/원거리 혼합 사격. 범용 전술 유닛(둥근 몸체)." },
+  { id:"rocketU",    name:"로켓포병",        hotkey:"", cost:150, hp:100, speed:1.15, range:220, atkRate:64, damage:18, mode:"bomb",  bulletSpeed:9.6, splashRadius:90, coreStrikes:6, desc:"원거리 폭발. 요새/군체 밀집에 강함(둥근 몸체)." },
+  { id:"tankU",      name:"전차",            hotkey:"", cost:220, hp:320, speed:0.85, range:260, atkRate:86, damage:28, mode:"bomb",  bulletSpeed:8.8, splashRadius:110, coreStrikes:7, desc:"사각형 몸체+포신. 장거리 포격 플랫폼." },
+  { id:"pentagonU",  name:"펜타곤",          hotkey:"", cost:260, hp:150, speed:1.05, range:240, atkRate:18, damage:3,  mode:"laser", laserGrow:0.22, laserMax:28, coreStrikes:6, desc:"오각형. 레이저를 오래 노출할수록 피해가 증가." }
+];
+
+/* ============ EPISODES / MAPS (6 episodes × 3 maps = 18) ============ */
+const EPISODES = [
+  {
+    id:"ep1", title:"EP1 — 착륙전: 교두보 & 전선 형성",
+    location:"MVBDH-1927495 · LZ 외곽",
+    brief:
+`MVBDH-1927495에서 사이비 집단이 요새 ‘콘스탄티노플’을 건설했다.
+그들은 토착 벌레 군체를 급속 진화시키고, 인간 또한 스스로를 ‘진화’시켰다고 주장한다.
+미국 원정군은 착륙 교두보를 확보하고 전선을 ‘고정’해야 한다.
+목표: 전선을 안정화하고 외곽 코어 노드를 파괴하라.`,
+    maps:["lz_A","lz_B","lz_C"]
+  },
+  {
+    id:"ep2", title:"EP2 — 변이 생물권: 군체 확산 차단",
+    location:"MVBDH-1927495 · 변이 지대",
+    brief:
+`군체는 전장을 ‘자기 환경’으로 바꾸며 적응한다.
+전선이 밀리면 방어 진화가, 밀어붙이면 공격 진화가 앞당겨진다.
+목표: 변이 거점(바이오-노드)을 제거해 확산을 차단하라.`,
+    maps:["mut_A","mut_B","mut_C"]
+  },
+  {
+    id:"ep3", title:"EP3 — 외벽 접근: 콘스탄티노플 전진선",
+    location:"MVBDH-1927495 · 요새 외벽 전초",
+    brief:
+`외벽은 생체 구조물과 인공 구조물이 융합된 ‘전진선’이다.
+개조된 해병(인간 진화체) 지휘관들이 군체를 유도한다.
+목표: 전선을 유지하며 외벽 노드를 관통하라.`,
+    maps:["wall_A","wall_B","wall_C"]
+  },
+  {
+    id:"ep4", title:"EP4 — 바이오포지: 진화 촉진 공정",
+    location:"MVBDH-1927495 · 하부 공정 구역",
+    brief:
+`내부 공정 구역은 군체를 생산하는 ‘생체 공장’이자 진화 촉진 장치의 일부다.
+장기전일수록 실드·리제너레이터·메딕 개체가 전장을 잠식한다.
+목표: 공정 라인을 파괴하고 진화 네트워크를 약화시켜라.`,
+    maps:["forge_A","forge_B","forge_C"]
+  },
+  {
+    id:"ep5", title:"EP5 — 성벽 돌파: 방어망 붕괴",
+    location:"MVBDH-1927495 · 성벽/요새 외곽",
+    brief:
+`성벽은 단순한 벽이 아니라 군체가 형성한 방어막이다.
+폭격기·포병을 동원해 밀집 방어를 무너뜨리고 전선을 최대한 밀어 올려야 한다.
+목표: 성벽 구역을 정리하고 중앙 성소로 진입하라.`,
+    maps:["breach_A","breach_B","breach_C"]
+  },
+  {
+    id:"ep6", title:"EP6 — 중심 성소: 네트워크 붕괴",
+    location:"MVBDH-1927495 · 콘스탄티노플 중심부",
+    brief:
+`중심부엔 ‘진화 기준점’이 있다. 그것이 군체와 인간 진화체를 동조시키고 있었다.
+마지막 방어선엔 항모급 캐리어가 투입된다.
+목표: 전선을 끝까지 밀어 코어를 파괴하고 콘스탄티노플을 무력화하라.`,
+    maps:["sanct_A","sanct_B","sanct_C"]
+  }
+];
+
+const MAPS = [
+  // EP1 — Landing Zone
+  { id:"lz_A", ep:0, name:"LZ-01 «Crater Causeway»", tileSize:42, cols:36, rows:20, difficulty:1.00, initialEnergy:560, clearWaves:6,
+    pathTiles:[[0,12],[6,12],[6,5],[12,5],[12,16],[18,16],[18,8],[26,8],[26,14],[35,14]],
+    enemyTowerMax:6, enemyTowerRadiusTiles:7
+  },
+  { id:"lz_B", ep:0, name:"LZ-02 «Basalt Ridges»", tileSize:42, cols:38, rows:20, difficulty:1.06, initialEnergy:580, clearWaves:7,
+    pathTiles:[[0,9],[8,9],[8,3],[16,3],[16,12],[24,12],[24,6],[31,6],[31,18],[37,18]],
+    enemyTowerMax:7, enemyTowerRadiusTiles:8
+  },
+  { id:"lz_C", ep:0, name:"LZ-03 «Switchback Valley»", tileSize:41, cols:40, rows:22, difficulty:1.12, initialEnergy:610, clearWaves:8,
+    pathTiles:[[0,14],[9,14],[9,6],[17,6],[17,19],[25,19],[25,10],[33,10],[33,20],[39,20]],
+    enemyTowerMax:8, enemyTowerRadiusTiles:8
+  },
+
+  // EP2 — Mutation Biome
+  { id:"mut_A", ep:1, name:"BIO-01 «Mutagen Marsh»", tileSize:40, cols:40, rows:22, difficulty:1.18, initialEnergy:640, clearWaves:8,
+    pathTiles:[[0,11],[7,11],[7,18],[15,18],[15,4],[23,4],[23,16],[30,16],[30,8],[39,8]],
+    enemyTowerMax:9, enemyTowerRadiusTiles:9
+  },
+  { id:"mut_B", ep:1, name:"BIO-02 «Spore Corridor»", tileSize:40, cols:42, rows:22, difficulty:1.25, initialEnergy:670, clearWaves:9,
+    pathTiles:[[0,10],[10,10],[10,4],[20,4],[20,19],[12,19],[12,13],[28,13],[28,6],[36,6],[36,20],[41,20]],
+    enemyTowerMax:10, enemyTowerRadiusTiles:9
+  },
+  { id:"mut_C", ep:1, name:"BIO-03 «Chitin Canal»", tileSize:39, cols:44, rows:22, difficulty:1.33, initialEnergy:700, clearWaves:10,
+    pathTiles:[[0,12],[12,12],[12,5],[22,5],[22,18],[16,18],[16,9],[30,9],[30,16],[38,16],[38,6],[43,6]],
+    enemyTowerMax:11, enemyTowerRadiusTiles:10
+  },
+
+  // EP3 — Outer Wall
+  { id:"wall_A", ep:2, name:"WALL-01 «Forward Trench»", tileSize:38, cols:46, rows:24, difficulty:1.42, initialEnergy:730, clearWaves:10,
+    pathTiles:[[0,13],[10,13],[10,6],[24,6],[24,20],[14,20],[14,11],[34,11],[34,22],[45,22]],
+    enemyTowerMax:12, enemyTowerRadiusTiles:10
+  },
+  { id:"wall_B", ep:2, name:"WALL-02 «Ranged Killbox»", tileSize:38, cols:48, rows:24, difficulty:1.50, initialEnergy:760, clearWaves:11,
+    pathTiles:[[0,9],[14,9],[14,3],[30,3],[30,18],[8,18],[8,13],[38,13],[38,22],[47,22]],
+    enemyTowerMax:13, enemyTowerRadiusTiles:10
+  },
+  { id:"wall_C", ep:2, name:"WALL-03 «S-Arc Approach»", tileSize:37, cols:50, rows:26, difficulty:1.58, initialEnergy:800, clearWaves:12,
+    pathTiles:[[0,14],[12,14],[12,22],[20,22],[20,6],[30,6],[30,20],[40,20],[40,10],[49,10]],
+    enemyTowerMax:14, enemyTowerRadiusTiles:11
+  },
+
+  // EP4 — Bioforge
+  { id:"forge_A", ep:3, name:"FORGE-01 «Vat Assembly»", tileSize:36, cols:54, rows:26, difficulty:1.70, initialEnergy:840, clearWaves:12,
+    pathTiles:[[0,12],[15,12],[15,5],[28,5],[28,20],[20,20],[20,10],[40,10],[40,24],[53,24]],
+    enemyTowerMax:15, enemyTowerRadiusTiles:11
+  },
+  { id:"forge_B", ep:3, name:"FORGE-02 «Splice Conveyor»", tileSize:36, cols:56, rows:26, difficulty:1.78, initialEnergy:880, clearWaves:13,
+    pathTiles:[[0,9],[18,9],[18,18],[26,18],[26,4],[38,4],[38,22],[12,22],[12,14],[46,14],[46,24],[55,24]],
+    enemyTowerMax:16, enemyTowerRadiusTiles:12
+  },
+  { id:"forge_C", ep:3, name:"FORGE-03 «Injector Lane»", tileSize:35, cols:58, rows:28, difficulty:1.86, initialEnergy:920, clearWaves:14,
+    pathTiles:[[0,15],[20,15],[20,6],[32,6],[32,24],[18,24],[18,11],[42,11],[42,26],[57,26]],
+    enemyTowerMax:17, enemyTowerRadiusTiles:12
+  },
+
+  // EP5 — Breach
+  { id:"breach_A", ep:4, name:"BREACH-01 «Rampart Roads»", tileSize:35, cols:60, rows:28, difficulty:1.98, initialEnergy:980, clearWaves:14,
+    pathTiles:[[0,11],[18,11],[18,4],[44,4],[44,18],[28,18],[28,14],[52,14],[52,26],[59,26]],
+    enemyTowerMax:18, enemyTowerRadiusTiles:12
+  },
+  { id:"breach_B", ep:4, name:"BREACH-02 «Wallshadow»", tileSize:34, cols:62, rows:30, difficulty:2.10, initialEnergy:1040, clearWaves:15,
+    pathTiles:[[0,16],[22,16],[22,6],[46,6],[46,24],[16,24],[16,12],[54,12],[54,28],[61,28]],
+    enemyTowerMax:20, enemyTowerRadiusTiles:13
+  },
+  { id:"breach_C", ep:4, name:"BREACH-03 «Gate Trench»", tileSize:34, cols:64, rows:30, difficulty:2.22, initialEnergy:1120, clearWaves:16,
+    pathTiles:[[0,12],[24,12],[24,4],[40,4],[40,22],[28,22],[28,10],[50,10],[50,28],[63,28]],
+    enemyTowerMax:22, enemyTowerRadiusTiles:13
+  },
+
+  // EP6 — Sanctum
+  { id:"sanct_A", ep:5, name:"SANCT-01 «Rayline Break»", tileSize:34, cols:66, rows:30, difficulty:2.40, initialEnergy:1300, clearWaves:16,
+    pathTiles:[[0,18],[18,18],[18,6],[52,6],[52,24],[22,24],[22,12],[60,12],[60,28],[65,28]],
+    enemyTowerMax:22, enemyTowerRadiusTiles:13,
+    special:{ bossOnlyAfterWave: 10, bossOnlyScale: 1.15 }
+  },
+  { id:"sanct_B", ep:5, name:"SANCT-02 «Ring of Pylons»", tileSize:33, cols:68, rows:32, difficulty:2.55, initialEnergy:1500, clearWaves:17,
+    pathTiles:[[0,14],[20,14],[20,5],[56,5],[56,26],[16,26],[16,16],[44,16],[44,10],[62,10],[62,30],[67,30]],
+    enemyTowerMax:24, enemyTowerRadiusTiles:14,
+    special:{ bossOnlyAfterWave: 9, bossOnlyScale: 1.22 }
+  },
+  { id:"sanct_C", ep:5, name:"SANCT-03 «Final Run»", tileSize:33, cols:70, rows:32, difficulty:2.75, initialEnergy:1700, clearWaves:18,
+    pathTiles:[[0,20],[22,20],[22,6],[58,6],[58,26],[30,26],[30,12],[64,12],[64,30],[69,30]],
+    enemyTowerMax:26, enemyTowerRadiusTiles:14,
+    special:{ bossOnlyAfterWave: 8, bossOnlyScale: 1.30 }
+  }
+];
+
+const URLS = {
+  towers: blobURL(EMBED_TOWERS),
+  enemyTowers: blobURL(EMBED_ENEMY_TOWERS),
+  enemies: blobURL(EMBED_ENEMIES),
+  units: blobURL(EMBED_UNITS),
+  episodes: blobURL(EPISODES),
+  maps: blobURL(MAPS)
+};
+
+/* =========================== GAME CORE =========================== */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d", {alpha:true});
+
+let CW=1280, CH=720, DPR=1;
+
+const elEp = document.getElementById("epDisp");
+const elMapName = document.getElementById("mapName");
+const elWave = document.getElementById("waveDisp");
+const elLife = document.getElementById("lifeDisp");
+const elEnergy = document.getElementById("energyDisp");
+const elCore = document.getElementById("coreDisp");
+const elCounts = document.getElementById("countsDisp");
+const elFrontline = document.getElementById("frontlineDisp");
+const elFrontlineBar = document.getElementById("frontlineBar");
+const elStatus = document.getElementById("status");
+const elSelTowerName = document.getElementById("selTowerName");
+const elSelUnitName  = document.getElementById("selUnitName");
+
+const towerBar = document.getElementById("towerBar");
+const unitBar = document.getElementById("unitBar");
+const mapSelect = document.getElementById("mapSelect");
+const startWaveBtn = document.getElementById("startWaveBtn");
+const restartBtn = document.getElementById("restartBtn");
+const storyBtn = document.getElementById("storyBtn");
+const spawnBtn = document.getElementById("spawnBtn");
+const modeTowerBtn = document.getElementById("modeTowerBtn");
+const modeUnitBtn = document.getElementById("modeUnitBtn");
+
+const modalBack = document.getElementById("modalBack");
+const storyTitle = document.getElementById("storyTitle");
+const storySub = document.getElementById("storySub");
+const storyText = document.getElementById("storyText");
+const storyGoal = document.getElementById("storyGoal");
+const closeStoryBtn = document.getElementById("closeStoryBtn");
+
+const epilogueBack = document.getElementById("epilogueBack");
+const epilogueBtn  = document.getElementById("epilogueBtn");
+
+const STORAGE_KEY = "starshield2_planetwars_progress";
+
+/* loaded */
+let towerTypes=[], enemyTowerTypes=[], enemyConfigs={}, unitTypes=[], episodes=[], maps=[];
+
+let currentEp=0;
+let currentMapId=null;
+let currentMap=null;
+let currentMapIndexInEpisode=0;
+
+let TILE=40, COLS=0, ROWS=0;
+let view={scale:1, ox:0, oy:0}; // world->screen
+
+let grid=[];
+let pathTiles=[];
+let pathPoints=[];
+
+let stars=[];
+let tick=0;
+
+let wave=0;
+let lives=20;
+let energy=500;
+
+// SS4: frontline (0 enemy-dominant .. 100 player-dominant)
+let frontline=50;
+
+let waveInProgress=false;
+let spawnQueue=[];
+let gameOver=false;
+let victory=false;
+
+/* entities */
+let enemyId=1, allyId=1, towerId=1, enemyTowerId=1;
+let enemies=[], allies=[], towers=[], enemyTowers=[];
+let bullets=[], allyBullets=[], enemyBullets=[], enemyTowerBullets=[];
+let pulses=[];
+
+let selectedTowerIndex=0;
+let selectedUnitIndex=0;
+
+let mode="tower"; // "tower" or "unit" (모바일에서 확실히)
+let mouse={tx:-1, ty:-1, ok:false, kind:"tower"};
+
+let enemyCore=null;
+let playerCore=null;
+
+/* enemy build AI */
+let redEnergy=0;
+let redBuildCooldown=0;
+
+/* utils */
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+// SS4 frontline helpers
+function clampFrontline(){ frontline = clamp(frontline, 0, 100); }
+function frontlineSpawnMinPi(){
+  // 100 => can spawn close to enemy start (index ~1), 0 => only near player base (near end)
+  const L = pathPoints.length;
+  if(L<=4) return 1;
+  const max = L-3;
+  const v = Math.floor((1 - frontline/100) * max) + 1;
+  return clamp(v, 1, max);
+}
+function getFrontlinePosition(){
+  // 전선의 실제 월드 좌표를 반환
+  const L = pathPoints.length;
+  if(L<=4) return pathPoints[1];
+  
+  // 전선: 아군과 적군이 실제로 만나는 지점
+  if(enemies.length > 0 && allies.length > 0) {
+    // 가장 뒤에 있는 적군 (아군 쪽으로 가장 많이 전진한 적)
+    const mostAdvancedEnemy = enemies.reduce((max, e) => 
+      e.pathIndex > max.pathIndex ? e : max
+    , enemies[0]);
+    
+    // 가장 앞에 있는 아군 (적 쪽으로 가장 많이 전진한 아군)  
+    const mostAdvancedAlly = allies.reduce((min, a) => 
+      a.pathIndex < min.pathIndex ? a : min
+    , allies[0]);
+    
+    // 두 유닛의 실제 위치 중간 지점
+    return {
+      x: (mostAdvancedEnemy.x + mostAdvancedAlly.x) / 2,
+      y: (mostAdvancedEnemy.y + mostAdvancedAlly.y) / 2
+    };
+  } 
+  
+  if(enemies.length > 0) {
+    // 적만 있으면 가장 전진한 적의 실제 위치
+    const mostAdvancedEnemy = enemies.reduce((max, e) => 
+      e.pathIndex > max.pathIndex ? e : max
+    , enemies[0]);
+    return {x: mostAdvancedEnemy.x, y: mostAdvancedEnemy.y};
+  } 
+  
+  if(allies.length > 0) {
+    // 아군만 있으면 가장 전진한 아군의 실제 위치
+    const mostAdvancedAlly = allies.reduce((min, a) => 
+      a.pathIndex < min.pathIndex ? a : min
+    , allies[0]);
+    return {x: mostAdvancedAlly.x, y: mostAdvancedAlly.y};
+  }
+  
+  // 아무도 없으면 중간
+  return pathPoints[Math.floor(L / 2)];
+}
+
+function getFrontlineIndex(){
+  // pathIndex가 필요한 곳을 위해 유지
+  const pos = getFrontlinePosition();
+  const L = pathPoints.length;
+  
+  // 가장 가까운 pathPoint 찾기
+  let closestIdx = 0;
+  let minDist = Infinity;
+  for(let i = 0; i < L; i++){
+    const d = dist(pos, pathPoints[i]);
+    if(d < minDist){
+      minDist = d;
+      closestIdx = i;
+    }
+  }
+  return clamp(closestIdx, 1, L-2);
+}
+function frontlineAdd(delta){
+  frontline += delta;
+  clampFrontline();
+}
+function dist(a,b){const dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy);}
+function tileCenter(tx,ty){return {x:tx*TILE+TILE/2, y:ty*TILE+TILE/2};}
+function worldW(){return COLS*TILE;}
+function worldH(){return ROWS*TILE;}
+
+function setStatus(msg, tone="good"){
+  elStatus.textContent = msg;
+  elStatus.classList.remove("goodText","badText","warnText");
+  if(tone==="good") elStatus.classList.add("goodText");
+  else if(tone==="bad") elStatus.classList.add("badText");
+  else elStatus.classList.add("warnText");
+}
+
+/* responsive canvas */
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  CW = Math.max(640, Math.floor(rect.width * DPR));
+  CH = Math.max(420, Math.floor(rect.height * DPR));
+  canvas.width = CW;
+  canvas.height = CH;
+  recalcFit();
+  clampCamera();
+}
+window.addEventListener("resize", resizeCanvas, {passive:true});
+
+/* progress */
+function defaultProgress(){
+  return { unlockedEpisode:0, unlockedMapByEpisode:{ "0":0 }, seenCutscene:{} };
+}
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultProgress();
+    const p=JSON.parse(raw);
+    if(typeof p.unlockedEpisode!=="number") p.unlockedEpisode=0;
+    if(!p.unlockedMapByEpisode) p.unlockedMapByEpisode={"0":0};
+    if(!p.seenCutscene) p.seenCutscene={};
+    return p;
+  }catch{
+    return defaultProgress();
+  }
+}
+function saveProgress(p){ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+/* camera */
+function recalcFit(){
+  if(COLS<=0||ROWS<=0) return;
+  const ww=worldW(), hh=worldH();
+  const s=Math.min(CW/ww, CH/hh);
+  view.scale = clamp(s, 0.25, 1.10);
+  view.ox = (CW - ww*view.scale)/2;
+  view.oy = (CH - hh*view.scale)/2;
+}
+function clampCamera(){
+  const ww = worldW()*view.scale;
+  const hh = worldH()*view.scale;
+  const margin=50;
+  const minOx = CW - ww - margin;
+  const maxOx = margin;
+  const minOy = CH - hh - margin;
+  const maxOy = margin;
+  view.ox = clamp(view.ox, Math.min(minOx,maxOx), Math.max(minOx,maxOx));
+  view.oy = clamp(view.oy, Math.min(minOy,maxOy), Math.max(minOy,maxOy));
+}
+function setWorldTransform(){ ctx.setTransform(view.scale,0,0,view.scale,view.ox,view.oy); }
+function resetTransform(){ ctx.setTransform(1,0,0,1,0,0); }
+
+function clientToCanvas(clientX, clientY){
+  const r = canvas.getBoundingClientRect();
+  const sx = (clientX - r.left) * (CW / r.width);
+  const sy = (clientY - r.top) * (CH / r.height);
+  return {sx, sy};
+}
+function screenToWorld(sx,sy){ return {x:(sx-view.ox)/view.scale, y:(sy-view.oy)/view.scale}; }
+
+/* stars */
+function initStars(){
+  stars=[];
+  for(let i=0;i<220;i++){
+    stars.push({x:Math.random()*CW,y:Math.random()*CH,r:Math.random()*1.8+0.2,t:Math.random()*0.9+0.3});
+  }
+}
+
+/* map grid helpers */
+function isInside(tx,ty){ return tx>=0 && ty>=0 && tx<COLS && ty<ROWS; }
+
+function findNearestValidTowerTile(tx,ty,maxR=3){
+  for(let r=0;r<=maxR;r++){
+    for(let dy=-r; dy<=r; dy++){
+      for(let dx=-r; dx<=r; dx++){
+        if(Math.abs(dx)!==r && Math.abs(dy)!==r) continue;
+        const x=tx+dx, y=ty+dy;
+        if(!isInside(x,y)) continue;
+        const c=grid[y][x];
+        if(!c.isPath && !c.hasTower && !c.hasEnemyTower) return {tx:x, ty:y};
+      }
+    }
+  }
+  return null;
+}
+function findNearestPathIndex(tx,ty,maxR=4){
+  for(let r=0;r<=maxR;r++){
+    for(let dy=-r; dy<=r; dy++){
+      for(let dx=-r; dx<=r; dx++){
+        if(Math.abs(dx)!==r && Math.abs(dy)!==r) continue;
+        const x=tx+dx, y=ty+dy;
+        if(!isInside(x,y)) continue;
+        if(grid[y][x].isPath){
+          const idx = pathTiles.findIndex(p=>p.x===x && p.y===y);
+          if(idx>=0) return idx;
+        }
+      }
+    }
+  }
+  return -1;
+}
+
+/* UI */
+function refreshUI(){
+  elEp.textContent = String(currentEp+1);
+  elMapName.textContent = currentMap ? currentMap.name : "-";
+  elWave.textContent = String(wave);
+  elLife.textContent = String(lives);
+  elEnergy.textContent = String(Math.floor(energy));
+  if(elFrontline){ elFrontline.textContent = `${Math.max(0,Math.min(100,Math.floor(frontline)))}%`; }
+  if(elFrontlineBar){ elFrontlineBar.style.width = `${Math.max(0,Math.min(100,frontline))}%`; }
+  elCore.textContent = enemyCore ? `${Math.max(0,Math.floor(enemyCore.hp))} / ${enemyCore.maxHp}` : "-";
+  elCounts.textContent = `아군 ${allies.length} | 적 ${enemies.length} | 적타워 ${enemyTowers.length}`;
+  elSelTowerName.textContent = towerTypes[selectedTowerIndex]?.name ?? "-";
+  elSelUnitName.textContent  = unitTypes[selectedUnitIndex]?.name ?? "-";
+
+  startWaveBtn.textContent = waveInProgress ? "⏳ 웨이브 진행 중" : "▶ 웨이브 시작";
+  startWaveBtn.style.opacity = waveInProgress ? 0.75 : 1.0;
+  startWaveBtn.style.cursor = waveInProgress ? "not-allowed" : "pointer";
+
+  spawnBtn.style.opacity = waveInProgress ? 1.0 : 0.55;
+}
+
+function buildTowerBar(){
+  towerBar.innerHTML="";
+  towerTypes.forEach((t,idx)=>{
+    const d=document.createElement("div");
+    d.className="card"+(idx===selectedTowerIndex?" sel":"");
+    d.innerHTML=`
+      <div class="cardTop">
+        <div class="name">${t.name}</div>
+        <div class="key">${t.hotkey || (idx+1)}</div>
+      </div>
+      <div class="cost">비용: ${t.cost} ⚡</div>
+      <div class="desc">${t.desc||""}</div>
+    `;
+    d.addEventListener("click", ()=>{
+      selectedTowerIndex=idx;
+      buildTowerBar();
+      refreshUI();
+      setStatus(`타워 선택: ${t.name}`, "good");
+    });
+    towerBar.appendChild(d);
+  });
+}
+function buildUnitBar(){
+  unitBar.innerHTML="";
+  unitTypes.forEach((u,idx)=>{
+    const d=document.createElement("div");
+    d.className="card"+(idx===selectedUnitIndex?" sel":"");
+    d.innerHTML=`
+      <div class="cardTop">
+        <div class="name">${u.name}</div>
+        <div class="key">${u.hotkey}</div>
+      </div>
+      <div class="cost">소환: ${u.cost} ⚡</div>
+      <div class="desc">${u.desc||""}</div>
+    `;
+    d.addEventListener("click", ()=>{
+      selectedUnitIndex=idx;
+      buildUnitBar();
+      refreshUI();
+      setStatus(`유닛 선택: ${u.name}`, "good");
+    });
+    unitBar.appendChild(d);
+  });
+}
+
+function rebuildMapSelect(){
+  const prog = loadProgress();
+  mapSelect.innerHTML="";
+
+  // flatten episode maps into one select, lock by (episode, mapIndex)
+  episodes.forEach((ep, eidx)=>{
+    const unlockedEp = prog.unlockedEpisode ?? 0;
+    const unlockedMap = (prog.unlockedMapByEpisode?.[String(eidx)] ?? 0);
+
+    ep.maps.forEach((mid, midx)=>{
+      const mp = maps.find(m=>m.id===mid);
+      const opt=document.createElement("option");
+      opt.value = `${eidx}:${midx}`;
+      const locked = (eidx>unlockedEp) || (eidx===unlockedEp && midx>unlockedMap);
+      opt.disabled = locked;
+      opt.textContent = locked
+        ? `🔒 EP${eidx+1}-${midx+1} · ${mp?.name || mid}`
+        : `EP${eidx+1}-${midx+1} · ${mp?.name || mid}`;
+      mapSelect.appendChild(opt);
+    });
+  });
+
+  mapSelect.value = `${currentEp}:${currentMapIndexInEpisode}`;
+}
+
+/* story modal */
+function showStory(epIndex){
+  const ep=episodes[epIndex];
+  if(!ep) return;
+  storyTitle.textContent = ep.title;
+  const mp = maps.find(m=>m.id===currentMapId);
+  storySub.textContent = `Location: ${ep.location} · Current Map: ${mp?.name || currentMapId}`;
+  storyText.textContent = ep.brief + `\n\n[진영 규칙]\n- 제4제국은 적 코어 근처에 자동으로 방어타워를 건설합니다.\n- 웨이브 중 +소환(버튼)으로 유닛 러시가 핵심입니다.\n- 유닛은 적 타워/적/코어를 공격합니다.`;
+  const goal = currentMap?.clearWaves ?? 6;
+  storyGoal.textContent = `이 맵: 웨이브 ${goal} 클리어 또는 적 코어 파괴`;
+  modalBack.style.display="flex";
+}
+function hideStory(){ modalBack.style.display="none"; }
+
+/* map init */
+function initMapByEpAndIndex(epIndex, mapIndex, showCutscene=true){
+  const prog = loadProgress();
+  const unlockedEp = prog.unlockedEpisode ?? 0;
+  const unlockedMap = (prog.unlockedMapByEpisode?.[String(epIndex)] ?? 0);
+
+  if(epIndex>unlockedEp || (epIndex===unlockedEp && mapIndex>unlockedMap)){
+    setStatus("아직 잠긴 맵입니다. 이전 맵을 클리어하세요.", "bad");
+    rebuildMapSelect();
+    return;
+  }
+
+  currentEp=epIndex;
+  currentMapIndexInEpisode=mapIndex;
+  currentMapId = episodes[epIndex].maps[mapIndex];
+
+  const map = maps.find(m=>m.id===currentMapId) || maps[0];
+  currentMap = JSON.parse(JSON.stringify(map));
+
+  TILE = currentMap.tileSize ?? 40;
+  COLS = currentMap.cols;
+  ROWS = currentMap.rows;
+
+  grid = Array.from({length:ROWS},()=>Array.from({length:COLS},()=>({isPath:false,hasTower:false,hasEnemyTower:false})));
+
+  pathTiles = currentMap.pathTiles.map(p=>({x:p[0],y:p[1]}));
+  for(const t of pathTiles){ if(isInside(t.x,t.y)) grid[t.y][t.x].isPath=true; }
+  pathPoints = pathTiles.map(t=>tileCenter(t.x,t.y));
+
+  // cores
+  const start = pathPoints[0];                         // enemy side
+  const end = pathPoints[pathPoints.length-1];         // player side
+  const diff = currentMap.difficulty ?? 1.0;
+
+  enemyCore = {
+    x:start.x, y:start.y,
+    maxHp: Math.floor(1150*diff + (currentMap.clearWaves*190)),
+    hp:    Math.floor(1150*diff + (currentMap.clearWaves*190))
+  };
+  playerCore = {x:end.x, y:end.y};
+
+  // reset state
+  resetGameStateOnly();
+
+  // initial red defense
+  redEnergy = 350 + Math.floor(200*diff);
+  placeInitialEnemyTowers();
+
+  recalcFit();
+  clampCamera();
+  resizeCanvas(); // ensure correct after DOM paint
+
+  refreshUI();
+  rebuildMapSelect();
+  setStatus(`EP${currentEp+1}-${currentMapIndexInEpisode+1} 시작: ${currentMap.name}`, "good");
+
+  // cutscene once per episode
+  if(showCutscene){
+    const key = episodes[currentEp].id;
+    if(!prog.seenCutscene[key]){
+      showStory(currentEp);
+      prog.seenCutscene[key]=true;
+      saveProgress(prog);
+    }
+  }
+}
+
+function resetGameStateOnly(){
+  enemies=[]; allies=[]; towers=[]; enemyTowers=[];
+  bullets=[]; allyBullets=[]; enemyBullets=[]; enemyTowerBullets=[];
+  pulses=[];
+  wave=0; lives=20;
+  energy = currentMap?.initialEnergy ?? 600;
+  waveInProgress=false; spawnQueue=[];
+  gameOver=false; victory=false;
+
+  enemyId=1; allyId=1; towerId=1; enemyTowerId=1;
+  tick=0;
+
+  redBuildCooldown=0;
+
+  for(let y=0;y<ROWS;y++){
+    for(let x=0;x<COLS;x++){
+      grid[y][x].hasTower=false;
+      grid[y][x].hasEnemyTower=false;
+    }
+  }
+  if(enemyCore) enemyCore.hp=enemyCore.maxHp;
+}
+
+/* Enemy tower placement near core */
+function tileDistToCore(tx,ty){
+  const c=tileCenter(tx,ty);
+  return dist(c, enemyCore);
+}
+function canPlaceEnemyTower(tx,ty){
+  if(!isInside(tx,ty)) return false;
+  const cell=grid[ty][tx];
+  if(cell.isPath || cell.hasTower || cell.hasEnemyTower) return false;
+  const maxTiles = currentMap.enemyTowerRadiusTiles ?? 10;
+  const maxDist = maxTiles*TILE;
+  return tileDistToCore(tx,ty) <= maxDist;
+}
+function placeEnemyTower(tx,ty, typeId){
+  const type = enemyTowerTypes.find(t=>t.id===typeId) || enemyTowerTypes[0];
+  if(!type) return false;
+  if(!canPlaceEnemyTower(tx,ty)) return false;
+
+  const c=tileCenter(tx,ty);
+  enemyTowers.push({
+    id: enemyTowerId++,
+    typeId: type.id,
+    x:c.x, y:c.y,
+    range:type.range,
+    fireRate:type.fireRate,
+    cooldown:Math.floor(type.fireRate*0.5),
+    damage:type.damage,
+    bulletSpeed:type.bulletSpeed,
+    splashRadius:type.splashRadius,
+    mode:type.mode,
+    hp:type.hp,
+    maxHp:type.hp,
+    slowFactor:type.slowFactor||1,
+    slowDuration:type.slowDuration||0,
+    spin:Math.random()*Math.PI*2
+  });
+  grid[ty][tx].hasEnemyTower=true;
+  return true;
+}
+function placeInitialEnemyTowers(){
+  const maxInit = Math.min(4 + Math.floor((currentMap.difficulty||1)*2), currentMap.enemyTowerMax||10);
+  let tries=0, placed=0;
+  while(placed<maxInit && tries<1200){
+    tries++;
+    const maxTiles = currentMap.enemyTowerRadiusTiles ?? 10;
+    const r = Math.max(4, maxTiles);
+    const cx = Math.floor(enemyCore.x/TILE);
+    const cy = Math.floor(enemyCore.y/TILE);
+
+    const tx = cx + Math.floor((Math.random()*2-1)*r);
+    const ty = cy + Math.floor((Math.random()*2-1)*r);
+
+    const typeRoll = Math.random();
+    const tid =
+      typeRoll<0.40 ? "r_laser" :
+      typeRoll<0.65 ? "r_mortar" :
+      typeRoll<0.82 ? "r_field" :
+      typeRoll<0.93 ? "r_sniper" : "r_burst";
+
+    if(placeEnemyTower(tx,ty,tid)){
+      placed++;
+      redEnergy -= (enemyTowerTypes.find(t=>t.id===tid)?.cost||0);
+    }
+  }
+}
+
+/* Player tower placement */
+function placeTowerAtTile(tx,ty){
+  if(gameOver||victory) return;
+  const type = towerTypes[selectedTowerIndex];
+  if(!type) return;
+
+  if(!isInside(tx,ty)) return;
+  const cell=grid[ty][tx];
+
+  if(cell.isPath){ setStatus("경로 위에는 타워 설치 불가!", "bad"); return; }
+  if(cell.hasTower){ setStatus("이미 타워가 있습니다.", "warn"); return; }
+  if(cell.hasEnemyTower){ setStatus("적 타워가 있는 칸입니다(먼저 제거).", "bad"); return; }
+  if(energy < type.cost){ setStatus("에너지가 부족합니다!", "bad"); return; }
+
+  const c=tileCenter(tx,ty);
+  towers.push({
+    id:towerId++,
+    x:c.x,y:c.y,
+    range:type.baseRange,
+    fireRate:type.fireRate,
+    cooldown:0,
+    damage:type.baseDamage,
+    bulletSpeed:type.bulletSpeed,
+    splashRadius:type.splashRadius,
+    slowFactor:type.slowFactor,
+    slowDuration:type.slowDuration,
+    poisonDps:type.poisonDps,
+    poisonDuration:type.poisonDuration,
+    typeId:type.id,
+    mode:type.mode,
+    hp:type.baseHp,
+    maxHp:type.baseHp,
+    healAmount:type.healAmount||0,
+    spin:Math.random()*Math.PI*2
+  });
+
+  cell.hasTower=true;
+  energy -= type.cost;
+  refreshUI();
+  setStatus(`${type.name} 설치!`, "good");
+}
+
+/* spawn enemies */
+function spawnEnemy(type){
+  const cfg0 = enemyConfigs[type] || enemyConfigs.normal;
+  const cfg = (cfg0 && cfg0.alias) ? (enemyConfigs[cfg0.alias] || enemyConfigs.normal) : cfg0;
+  const start = pathPoints[0];
+  const diff = currentMap?.difficulty ?? 1.0;
+
+  const hpBase = (52 + wave*10) * diff;
+  const hp = hpBase * (cfg.hpFactor||1);
+  const speed = (cfg.speedBase||1) + wave*(cfg.speedGrow||0.05);
+
+  const e = {
+    id:enemyId++,
+    type,
+    x:start.x,y:start.y,
+    hp, maxHp:hp,
+    baseSpeed:speed,
+    pathIndex:0, progress:0,
+    slowTimer:0, slowFactor:1,
+    shieldHp:0, shieldMax:0,
+    poisonTimer:0, poisonDps:0,
+    regenFactor:cfg.regenFactor||0,
+
+    atkRange:cfg.atkRange||140,
+    atkRate:cfg.atkRate||70,
+    atkCooldown:Math.floor(cfg.atkRate*0.3),
+    atkDamage:cfg.atkDamage||6,
+
+    healRadius:cfg.healRadius||0,
+    healFactor:cfg.healFactor||0,
+    healInterval:cfg.healInterval||999,
+
+    color:cfg.color||"#fff"
+  };
+  if(type==="shield"){
+    e.shieldMax = hp*0.85;
+    e.shieldHp = e.shieldMax;
+  }
+  enemies.push(e);
+}
+
+/* ally spawn */
+function spawnAllyAtPathIndex(pi){
+  if(gameOver||victory) return;
+  if(!waveInProgress){
+    setStatus("유닛 소환은 웨이브 진행 중에만 가능합니다.", "warn");
+    return;
+  }
+  const u = unitTypes[selectedUnitIndex];
+  if(!u) return;
+  if(energy < u.cost){
+    setStatus("에너지가 부족해서 소환 불가!", "bad");
+    return;
+  }
+  pi = clamp(pi, 0, pathPoints.length-1);
+  const minPi = frontlineSpawnMinPi();
+  if(pi < minPi){
+    setStatus(`전선이 부족합니다! (현재 전선 ${Math.floor(frontline)}%) 더 뒤에서 소환하세요.`, "warn");
+    return;
+  }
+
+  const p=pathPoints[pi];
+  const ally={
+    id:allyId++,
+    typeId:u.id,
+    name:u.name,
+    x:p.x,y:p.y,
+    hp:u.hp, maxHp:u.hp,
+    speed:u.speed,
+    range:u.range,
+    atkRate:u.atkRate,
+    cooldown:0,
+    damage:u.damage,
+    mode:u.mode,
+    bulletSpeed:u.bulletSpeed||11,
+    splashRadius:u.splashRadius||0,
+    healAmount:u.healAmount||0,
+    empSlow:u.empSlow||1,
+    empDur:u.empDur||0,
+    pathIndex:pi,
+    progress:0,
+
+    coreStrikesLeft: u.coreStrikes ?? 6,
+    coreCooldown:0,
+
+    bornTick:tick,
+    tint:"ally"
+  };
+
+  // 작은 시너지(연속 소환)
+  const recentSame = allies.filter(a=>a.typeId===ally.typeId && (tick-a.bornTick)<=210).length;
+  if(recentSame>=2){
+    ally.damage = Math.floor(ally.damage*1.15);
+    ally.maxHp = Math.floor(ally.maxHp*1.12);
+    ally.hp = ally.maxHp;
+    pulses.push({x:ally.x,y:ally.y,r:0,maxR:140,alpha:0.75,kind:"synergy"});
+  }
+
+  // SS4: laser exposure stacking (pentagon)
+  if(ally.mode==="laser"){
+    ally.laserTargetId=null;
+    ally.laserTargetKind="";
+    ally.laserStack=0;
+    ally.laserGrow = u.laserGrow||0.2;
+    ally.laserMax = u.laserMax||24;
+  }
+
+  energy -= u.cost;
+  allies.push(ally);
+  refreshUI();
+  setStatus(`유닛 투입: ${u.name}`, "good");
+}
+
+/* wave creation with map special rules */
+function createWave(){
+  if(gameOver||victory){ setStatus("이미 끝났습니다. R로 재시작.", "bad"); return; }
+  if(waveInProgress){ setStatus("웨이브 진행 중입니다.", "warn"); return; }
+
+  wave++;
+  const diff = currentMap?.difficulty ?? 1.0;
+
+  // enemy resource grows
+  redEnergy += Math.floor((160 + wave*32) * diff);
+  redBuildCooldown = Math.min(redBuildCooldown, 20);
+
+  spawnQueue=[];
+  let delay=0;
+
+  // blackhole special: after certain wave -> only boss
+  const sp = currentMap?.special;
+  const bossOnly = sp?.bossOnlyAfterWave != null && wave >= sp.bossOnlyAfterWave;
+
+  if(bossOnly){
+    const scale = sp?.bossOnlyScale ?? 1.15;
+    const count = Math.max(2, Math.floor((3 + wave*0.35) * scale));
+    for(let i=0;i<count;i++){
+      spawnQueue.push({type:"boss", spawnTick: tick + delay});
+      delay += 85;
+    }
+    setStatus(`Wave ${wave}: 사건지평선 — Reich Carrier 연속 투입`, "warn");
+  }else{
+    const baseCount = Math.floor((10 + wave*3) * diff);
+    for(let i=0;i<baseCount;i++){
+      let type;
+      if (wave>=13 && i%12===0) type="medic";
+      else if (wave>=12 && i%10===0) type="bomber";
+      else if (wave>=11 && i%9 ===0) type="brute";
+      else if (wave>=10 && i%8 ===0) type="shield";
+      else if (wave>=9  && i%7 ===0) type="regen";
+      else if (wave>=8  && i%6 ===0) type="tank";
+      else if (wave>=7  && i%5 ===0) type="sniper";
+      else if (wave>=6  && i%4 ===0) type="swarm";
+      else if (wave>=4  && i%3 ===0) type="fast";
+      else type="normal";
+      spawnQueue.push({type, spawnTick: tick+delay});
+      delay += (type==="swarm"?18:36);
+    }
+    if(wave % 5 === 0) spawnQueue.push({type:"boss", spawnTick: tick+delay+80});
+    setStatus(`Wave ${wave} 시작!`, "good");
+  }
+
+  waveInProgress=true;
+
+  // small energy drip
+  energy += 25;
+  refreshUI();
+}
+
+/* damage helpers */
+function applySlow(target, slowFactor, slowDuration){
+  if(!slowDuration || slowFactor>=1) return;
+  if(target.slowTimer==null){
+    target.slowTimer=0;
+    target.slowFactor=1;
+  }
+  // apply stronger slow
+  if(slowFactor < target.slowFactor){
+    target.slowFactor = slowFactor;
+    target.slowTimer = Math.max(target.slowTimer, slowDuration);
+  }
+}
+
+function applyDamageToEnemy(e, dmg, slowFactor=1, slowDuration=0, poisonDps=0, poisonDuration=0){
+  if(e.shieldHp>0){
+    const used=Math.min(e.shieldHp,dmg);
+    e.shieldHp-=used;
+    dmg-=used;
+  }
+  if(dmg>0) e.hp-=dmg;
+
+  if(slowDuration>0) applySlow(e, slowFactor, slowDuration);
+  if(poisonDuration>0 && poisonDps>0){
+    e.poisonDps = Math.max(e.poisonDps||0, poisonDps);
+    e.poisonTimer = Math.max(e.poisonTimer||0, poisonDuration);
+  }
+}
+
+function applyDamageToEnemyTower(tw, dmg, slowFactor=1, slowDuration=0){
+  tw.hp -= dmg;
+  if(slowDuration>0) applySlow(tw, slowFactor, slowDuration);
+}
+
+function applyDamageToCore(dmg){
+  if(!enemyCore) return;
+  enemyCore.hp -= dmg;
+  pulses.push({x:enemyCore.x,y:enemyCore.y,r:0,maxR:180,alpha:0.65,kind:"coreHit"});
+  if(enemyCore.hp<=0){
+    enemyCore.hp=0;
+    triggerVictory(true);
+  }
+}
+
+/* victory / progression: clear map -> unlock next map (or next episode) */
+function fadeTo(url){
+  const f=document.getElementById("fadeOverlay");
+  if(!f){ window.location.href=url; return; }
+  f.style.pointerEvents="auto";
+  requestAnimationFrame(()=>{ f.style.opacity="1"; });
+  setTimeout(()=>{ window.location.href=url; }, 620);
+}
+
+function showEpilogue(){
+  const back=document.getElementById("epilogueBack");
+  if(back) back.style.display="flex";
+  // auto jump to ep.html after a short pause
+  setTimeout(()=>{ try{ fadeTo("ep.html"); }catch(e){} }, 1500);
+}
+
+function triggerVictory(byCore){
+  if(victory) return;
+  victory=true;
+  waveInProgress=false;
+  spawnQueue=[];
+  const bonus = byCore ? 300 : 200;
+  energy += bonus;
+  refreshUI();
+
+  const prog = loadProgress();
+  const ekey = String(currentEp);
+  const unlockedEp = prog.unlockedEpisode ?? 0;
+  const unlockedMap = prog.unlockedMapByEpisode?.[ekey] ?? 0;
+
+  // advance within episode
+  if(currentEp < unlockedEp){
+    // already beyond, don't change
+  }else if(currentEp === unlockedEp){
+    if(currentMapIndexInEpisode >= unlockedMap){
+      if(currentMapIndexInEpisode < 2){
+        prog.unlockedMapByEpisode[ekey] = currentMapIndexInEpisode + 1;
+      }else{
+        // unlock next episode
+        prog.unlockedEpisode = Math.min(episodes.length-1, unlockedEp + 1);
+        const nextKey = String(prog.unlockedEpisode);
+        if(prog.unlockedMapByEpisode[nextKey]==null) prog.unlockedMapByEpisode[nextKey]=0;
+      }
+    }
+  }
+  saveProgress(prog);
+  rebuildMapSelect();
+
+  const isFinal = (currentEp===episodes.length-1) && (currentMapIndexInEpisode===2);
+  if(isFinal){
+    // All cleared -> go to epilogue page
+    try{ fadeTo("ep.html"); }catch(e){ window.location.href = "ep.html"; }
+    return;
+  }
+
+  setStatus(byCore ? `승리! 적 코어 파괴 (+${bonus}⚡)` : `클리어! 목표 웨이브 달성 (+${bonus}⚡)`, "good");
+}
+
+/* enemy AI: build towers near core */
+function enemyBuildAI(){
+  if(gameOver||victory) return;
+  if(enemyTowers.length >= (currentMap.enemyTowerMax||12)) return;
+
+  if(redBuildCooldown>0){ redBuildCooldown--; return; }
+  if(redEnergy < 120) return;
+
+  // choose type by wave
+  let pick;
+  if(wave>=12 && Math.random()<0.25) pick="r_burst";
+  else if(wave>=10 && Math.random()<0.20) pick="r_sniper";
+  else if(wave>=8 && Math.random()<0.25) pick="r_field";
+  else if(wave>=6 && Math.random()<0.28) pick="r_mortar";
+  else pick="r_laser";
+
+  const type = enemyTowerTypes.find(t=>t.id===pick) || enemyTowerTypes[0];
+  if(!type) return;
+  if(redEnergy < type.cost) return;
+
+  const cx = Math.floor(enemyCore.x/TILE);
+  const cy = Math.floor(enemyCore.y/TILE);
+  const R = currentMap.enemyTowerRadiusTiles ?? 10;
+
+  let placed=false;
+  for(let tries=0; tries<220; tries++){
+    const tx = cx + Math.floor((Math.random()*2-1)*R);
+    const ty = cy + Math.floor((Math.random()*2-1)*R);
+    if(placeEnemyTower(tx,ty, type.id)){ placed=true; break; }
+  }
+
+  if(placed){
+    redEnergy -= type.cost;
+    redBuildCooldown = 70 - Math.min(35, wave*2);
+    pulses.push({x:enemyCore.x,y:enemyCore.y,r:0,maxR:160,alpha:0.55,kind:"enemyBuild"});
+  }else{
+    redBuildCooldown = 30;
+  }
+}
+
+/* updates */
+function updateEnemies(){
+  // spawn schedule
+  if(waveInProgress && spawnQueue.length>0){
+    while(spawnQueue.length>0 && spawnQueue[0].spawnTick<=tick){
+      const s=spawnQueue.shift();
+      spawnEnemy(s.type);
+    }
+  }
+
+  for(let i=enemies.length-1;i>=0;i--){
+    const e=enemies[i];
+
+    // status
+    if(e.slowTimer>0){ e.slowTimer--; if(e.slowTimer<=0) e.slowFactor=1; }
+    if(e.poisonTimer>0 && e.poisonDps>0){ e.poisonTimer--; e.hp -= e.poisonDps; }
+    if(e.type==="shield"){
+      if(tick%40===0 && e.shieldHp<e.shieldMax){
+        e.shieldHp = Math.min(e.shieldMax, e.shieldHp + e.maxHp*0.05);
+      }
+    }
+    if(e.regenFactor>0 && tick%35===0){
+      e.hp = Math.min(e.maxHp, e.hp + e.maxHp*e.regenFactor);
+    }
+    if(e.type==="medic" && e.healRadius>0 && e.healFactor>0){
+      if(tick % e.healInterval === 0){
+        let healed=false;
+        for(const other of enemies){
+          if(other===e) continue;
+          if(dist(e,other) <= e.healRadius){
+            const before=other.hp;
+            other.hp = Math.min(other.maxHp, other.hp + other.maxHp*e.healFactor);
+            if(other.hp>before) healed=true;
+          }
+        }
+        if(healed) pulses.push({x:e.x,y:e.y,r:0,maxR:e.healRadius*0.85,alpha:0.7,kind:"enemyHeal"});
+      }
+    }
+
+    // movement along path toward player base (SS4: frontline hold)
+// enemies march until they reach the frontline, then they HOLD and fight there.
+const fi = getFrontlineIndex();
+// 전선에 도달했고 && 사거리 내에 적(아군 또는 타워)이 있으면 멈춤
+if(e.pathIndex >= fi){
+  let hasTarget = false;
+  // 사거리 내 아군 확인
+  for(const a of allies){
+    if(dist(e,a) <= e.atkRange){ hasTarget = true; break; }
+  }
+  // 사거리 내 타워 확인
+  if(!hasTarget){
+    for(const t of towers){
+      if(dist(e,t) <= e.atkRange){ hasTarget = true; break; }
+    }
+  }
+  
+  // 적이 있으면 멈춤 (위치는 유지), 없으면 계속 전진
+  if(!hasTarget){
+    // 앞에 적이 없으면 계속 전진
+    const from = pathPoints[e.pathIndex];
+    const to = pathPoints[e.pathIndex+1];
+    if(!to){
+      // reached player base
+      enemies.splice(i,1);
+      lives -= 1;
+      frontlineAdd(-3.0);
+      if(lives<=0){
+        lives=0;
+        gameOver=true;
+        waveInProgress=false;
+        spawnQueue=[];
+        setStatus("MISSION FAILED... R로 재시작", "bad");
+      }else{
+        setStatus("적이 기지에 도달했습니다!", "bad");
+      }
+      continue;
+    }
+    const dx=to.x-from.x, dy=to.y-from.y;
+    const segLen=Math.sqrt(dx*dx+dy*dy)||1;
+    const step = e.baseSpeed * (e.slowFactor||1);
+    e.progress += step/segLen;
+    if(e.progress>=1){
+      e.pathIndex++;
+      e.progress=0;
+    }
+    const base=pathPoints[e.pathIndex];
+    const tgt=pathPoints[e.pathIndex+1]||base;
+    e.x = base.x + (tgt.x-base.x)*e.progress;
+    e.y = base.y + (tgt.y-base.y)*e.progress;
+  }
+  // hasTarget이 true면 그냥 멈춤 (위치 변경 없음)
+}else{
+  const from = pathPoints[e.pathIndex];
+  const to = pathPoints[e.pathIndex+1];
+  if(!to){
+    // reached player base
+    enemies.splice(i,1);
+    lives -= 1;
+    frontlineAdd(-3.0);
+    if(lives<=0){
+      lives=0;
+      gameOver=true;
+      waveInProgress=false;
+      spawnQueue=[];
+      setStatus("MISSION FAILED... R로 재시작", "bad");
+    }else{
+      setStatus("적이 기지에 도달했습니다!", "bad");
+    }
+    continue;
+  }
+  const dx=to.x-from.x, dy=to.y-from.y;
+  const segLen=Math.sqrt(dx*dx+dy*dy)||1;
+  const step = e.baseSpeed * (e.slowFactor||1);
+  e.progress += step/segLen;
+  if(e.progress>=1){
+    e.pathIndex++;
+    e.progress=0;
+  }
+  const base=pathPoints[e.pathIndex];
+  const tgt=pathPoints[e.pathIndex+1]||base;
+  e.x = base.x + (tgt.x-base.x)*e.progress;
+  e.y = base.y + (tgt.y-base.y)*e.progress;
+}
+
+    // enemy attack: prefer nearest ally, then player tower
+    if(e.atkCooldown>0) e.atkCooldown--;
+    if(e.atkCooldown<=0){
+      let target=null, kind="";
+      let best=Infinity;
+
+      for(const a of allies){
+        const d=dist(e,a);
+        if(d<e.atkRange && d<best){ best=d; target=a; kind="ally"; }
+      }
+      for(const t of towers){
+        const d=dist(e,t);
+        if(d<e.atkRange && d<best){ best=d; target=t; kind="tower"; }
+      }
+
+      if(target){
+        let splash=40;
+        if(e.type==="tank") splash=70;
+        else if(e.type==="boss") splash=95;
+        else if(e.type==="bomber") splash=110;
+        else if(e.type==="sniper") splash=30;
+
+        enemyBullets.push({
+          x:e.x,y:e.y,
+          targetId:target.id,
+          targetKind:kind,
+          tx:target.x, ty:target.y,
+          speed:6.3,
+          damage:e.atkDamage,
+          splashRadius:splash
+        });
+        e.atkCooldown=e.atkRate;
+      }
+    }
+
+    if(e.hp<=0){
+      // SS4: cluster splits into larva
+      if(e.type==="cluster"){
+        const n = 2 + Math.floor(Math.random()*3); // 2~4
+        for(let k=0;k<n;k++){
+          // spawn near current position (manual clone)
+          const cfg0 = enemyConfigs["larva"] || enemyConfigs.normal;
+          const cfg = (cfg0 && cfg0.alias) ? (enemyConfigs[cfg0.alias] || enemyConfigs.normal) : cfg0;
+          const hpBase = (52 + wave*10) * (currentMap?.difficulty ?? 1.0);
+          const hp = hpBase * (cfg.hpFactor||1);
+          const speed = (cfg.speedBase||1) + wave*(cfg.speedGrow||0.05);
+          enemies.push({
+            id:enemyId++,
+            type:"larva",
+            x:e.x + (Math.random()*26-13), y:e.y + (Math.random()*26-13),
+            hp, maxHp:hp,
+            baseSpeed:speed,
+            pathIndex:e.pathIndex, progress:e.progress,
+            slowTimer:0, slowFactor:1,
+            shieldHp:0, shieldMax:0,
+            poisonTimer:0, poisonDps:0,
+            regenFactor:cfg.regenFactor||0,
+            atkRange:cfg.atkRange||140,
+            atkRate:cfg.atkRate||70,
+            atkCooldown:Math.floor((cfg.atkRate||70)*0.3),
+            atkDamage:cfg.atkDamage||6,
+            healRadius:cfg.healRadius||0,
+            healFactor:cfg.healFactor||0,
+            healInterval:cfg.healInterval||999,
+            color:cfg.color||"#fff"
+          });
+        }
+      }
+
+      enemies.splice(i,1);
+      energy += (8 + wave*2);
+
+      // SS4: frontline push
+      const elite = (e.type==="boss"||e.type==="carrier");
+      const heavy = (e.type==="brute"||e.type==="juggernaut"||e.type==="tank"||e.type==="bulb");
+      frontlineAdd(elite ? 2.2 : (heavy ? 1.2 : 0.65));
+
+      redEnergy += 10; // 적도 전장 자원 조금
+    }
+  }
+
+  // wave end condition
+  if(waveInProgress && spawnQueue.length===0 && enemies.length===0 && !gameOver && !victory){
+    waveInProgress=false;
+    const reward = Math.floor(80 + wave*22);
+    energy += reward;
+    setStatus(`Wave ${wave} 방어 성공! +${reward} ⚡`, "good");
+
+    // map goal
+    if(wave >= (currentMap?.clearWaves ?? 6)){
+      triggerVictory(false);
+    }
+  }
+}
+
+function updateEnemyTowers(){
+  enemyBuildAI();
+
+  for(const tw of enemyTowers){
+    if(tw.slowTimer>0){ tw.slowTimer--; if(tw.slowTimer<=0) tw.slowFactor=1; }
+    if(tw.cooldown>0) tw.cooldown--;
+
+    // choose target: nearest ally first, then player tower
+    let target=null, kind="";
+    let best=Infinity;
+
+    for(const a of allies){
+      const d=dist(tw,a);
+      if(d<tw.range && d<best){best=d; target=a; kind="ally";}
+    }
+    for(const t of towers){
+      const d=dist(tw,t);
+      if(d<tw.range && d<best){best=d; target=t; kind="tower";}
+    }
+
+    if(target && tw.cooldown<=0){
+      if(tw.mode==="pulse"){
+        const radius = tw.range*0.82;
+        // pulse hits nearby allies/towers
+        for(const a of allies){
+          if(dist(tw,a)<=radius) a.hp -= tw.damage;
+        }
+        for(const t of towers){
+          if(dist(tw,t)<=radius) t.hp -= tw.damage;
+        }
+        pulses.push({x:tw.x,y:tw.y,r:0,maxR:radius,alpha:0.7,kind:"redPulse"});
+      }else{
+        enemyTowerBullets.push({
+          x:tw.x,y:tw.y,
+          targetId:target.id,
+          targetKind:kind,
+          tx:target.x, ty:target.y,
+          speed:tw.bulletSpeed||8,
+          damage:tw.damage,
+          splashRadius:tw.splashRadius||0,
+          slowFactor:tw.slowFactor||1,
+          slowDuration:tw.slowDuration||0
+        });
+      }
+      tw.cooldown = tw.fireRate;
+    }
+    tw.spin += 0.05;
+  }
+
+  // remove dead enemy towers (and clear tile)
+  for(let i=enemyTowers.length-1;i>=0;i--){
+    const tw=enemyTowers[i];
+    if(tw.hp<=0){
+      const tx=Math.floor(tw.x/TILE);
+      const ty=Math.floor(tw.y/TILE);
+      if(isInside(tx,ty)) grid[ty][tx].hasEnemyTower=false;
+      enemyTowers.splice(i,1);
+      energy += 18; // reward for destroying defenses
+      setStatus("적 타워 파괴! (+18⚡)", "good");
+    }
+  }
+}
+
+function updateTowers(){
+  for(const t of towers){
+    if(t.cooldown>0) t.cooldown--;
+
+    if(t.mode==="heal"){
+      if(t.cooldown<=0){
+        let healed=false;
+        for(const other of towers){
+          if(other===t) continue;
+          if(dist(t,other)<=t.range){
+            const before=other.hp;
+            other.hp = Math.min(other.maxHp, other.hp + t.healAmount);
+            if(other.hp>before) healed=true;
+          }
+        }
+        if(healed) pulses.push({x:t.x,y:t.y,r:0,maxR:t.range*0.7,alpha:0.55,kind:"towerHeal"});
+        t.cooldown=t.fireRate;
+      }
+      t.spin += 0.05;
+      continue;
+    }
+
+    // target priority: enemy units -> enemy towers -> core
+    let targetE=null, bestE=Infinity;
+    for(const e of enemies){
+      const d=dist(t,e);
+      if(d<t.range && d<bestE){bestE=d; targetE=e;}
+    }
+    let targetTw=null, bestTw=Infinity;
+    if(!targetE){
+      for(const tw of enemyTowers){
+        const d=dist(t,tw);
+        if(d<t.range && d<bestTw){bestTw=d; targetTw=tw;}
+      }
+    }
+    const canHitCore = (!targetE && !targetTw && enemyCore && dist(t,enemyCore)<=t.range);
+
+    if(t.mode==="pulse"){
+      if(t.cooldown<=0 && (targetE||targetTw||canHitCore)){
+        const radius=t.range*0.88;
+        for(const e of enemies){
+          if(dist(t,e)<=radius) applyDamageToEnemy(e, t.damage, 1,0,0,0);
+        }
+        for(const tw of enemyTowers){
+          if(dist(t,tw)<=radius) applyDamageToEnemyTower(tw, t.damage, t.slowFactor, t.slowDuration);
+        }
+        if(enemyCore && dist(t,enemyCore)<=radius) applyDamageToCore(Math.floor(t.damage*0.65));
+        pulses.push({x:t.x,y:t.y,r:0,maxR:radius,alpha:0.7,kind:"pulse"});
+        t.cooldown=t.fireRate;
+      }
+    }else{
+      if(t.cooldown<=0 && (targetE||targetTw||canHitCore)){
+        const tx = targetE?targetE.x:(targetTw?targetTw.x:enemyCore.x);
+        const ty = targetE?targetE.y:(targetTw?targetTw.y:enemyCore.y);
+        bullets.push({
+          x:t.x,y:t.y,
+          targetKind: targetE?"enemy":(targetTw?"enemyTower":"core"),
+          targetId: targetE?targetE.id:(targetTw?targetTw.id:0),
+          tx,ty,
+          speed:t.bulletSpeed,
+          damage:t.damage,
+          splashRadius:t.splashRadius,
+          slowFactor:t.slowFactor,
+          slowDuration:t.slowDuration,
+          poisonDps:t.poisonDps,
+          poisonDuration:t.poisonDuration,
+          towerType:t.typeId
+        });
+        t.cooldown=t.fireRate;
+      }
+    }
+    t.spin += 0.05;
+  }
+
+  // remove destroyed player towers
+  for(let i=towers.length-1;i>=0;i--){
+    const t=towers[i];
+    if(t.hp<=0){
+      const tx=Math.floor(t.x/TILE), ty=Math.floor(t.y/TILE);
+      if(isInside(tx,ty)) grid[ty][tx].hasTower=false;
+      towers.splice(i,1);
+      setStatus("아군 타워가 파괴되었습니다!", "bad");
+    }
+  }
+}
+
+function updateAllies(){
+  for(let i=allies.length-1;i>=0;i--){
+    const a=allies[i];
+    if(a.hp<=0){ allies.splice(i,1); continue; }
+
+    if(a.slowTimer>0){ a.slowTimer--; if(a.slowTimer<=0) a.slowFactor=1; }
+    if(a.cooldown>0) a.cooldown--;
+    if(a.coreCooldown>0) a.coreCooldown--;
+
+    // heal mode
+    if(a.mode==="heal"){
+      if(a.cooldown<=0){
+        let healed=false;
+        for(const other of allies){
+          if(other===a) continue;
+          if(dist(a,other)<=a.range){
+            const before=other.hp;
+            other.hp = Math.min(other.maxHp, other.hp + a.healAmount);
+            if(other.hp>before) healed=true;
+          }
+        }
+        if(healed) pulses.push({x:a.x,y:a.y,r:0,maxR:a.range*0.75,alpha:0.55,kind:"allyHeal"});
+        a.cooldown=a.atkRate;
+      }
+    }else{
+      // target priority: enemy near -> enemy tower -> core
+      let targetE=null, bestE=Infinity;
+      for(const e of enemies){
+        const d=dist(a,e);
+        if(d<a.range && d<bestE){bestE=d; targetE=e;}
+      }
+      let targetTw=null, bestTw=Infinity;
+      if(!targetE){
+        for(const tw of enemyTowers){
+          const d=dist(a,tw);
+          if(d<a.range && d<bestTw){bestTw=d; targetTw=tw;}
+        }
+      }
+      const canHitCore = (!targetE && !targetTw && enemyCore && dist(a,enemyCore)<=a.range);
+
+      if(a.cooldown<=0){
+        if(targetE){
+          if(a.mode==="melee"){
+            applyDamageToEnemy(targetE, a.damage);
+            pulses.push({x:targetE.x,y:targetE.y,r:0,maxR:55,alpha:0.45,kind:"melee"});
+          }else if(a.mode==="emp"){
+            allyBullets.push({
+              x:a.x,y:a.y, targetKind:"enemy", targetId:targetE.id,
+              tx:targetE.x, ty:targetE.y, speed:a.bulletSpeed,
+              damage:a.damage, splashRadius:0,
+              empSlow:a.empSlow, empDur:a.empDur
+            });
+          }else if(a.mode==="laser"){
+            const same = (a.laserTargetKind==="enemy" && a.laserTargetId===targetE.id);
+            if(!same){ a.laserTargetKind="enemy"; a.laserTargetId=targetE.id; a.laserStack=0; }
+            a.laserStack = Math.min(a.laserMax, a.laserStack + a.laserGrow*10);
+            const dmg = a.damage + a.laserStack;
+            applyDamageToEnemy(targetE, dmg);
+            // thin beam pulse
+            pulses.push({x:a.x,y:a.y,r:0,maxR:Math.min(260, a.range),alpha:0.28,kind:"laser"});
+          }else{
+            allyBullets.push({
+              x:a.x,y:a.y, targetKind:"enemy", targetId:targetE.id,
+              tx:targetE.x, ty:targetE.y, speed:a.bulletSpeed,
+              damage:a.damage, splashRadius:a.splashRadius||0
+            });
+          }
+          a.cooldown=a.atkRate;
+        }else if(targetTw){
+          if(a.mode==="melee"){
+            applyDamageToEnemyTower(targetTw, a.damage);
+            pulses.push({x:targetTw.x,y:targetTw.y,r:0,maxR:55,alpha:0.45,kind:"melee"});
+          }else if(a.mode==="emp"){
+            allyBullets.push({
+              x:a.x,y:a.y, targetKind:"enemyTower", targetId:targetTw.id,
+              tx:targetTw.x, ty:targetTw.y, speed:a.bulletSpeed,
+              damage:a.damage, splashRadius:0,
+              empSlow:a.empSlow, empDur:a.empDur
+            });
+          }else if(a.mode==="laser"){
+            const same = (a.laserTargetKind==="enemyTower" && a.laserTargetId===targetTw.id);
+            if(!same){ a.laserTargetKind="enemyTower"; a.laserTargetId=targetTw.id; a.laserStack=0; }
+            a.laserStack = Math.min(a.laserMax, a.laserStack + a.laserGrow*10);
+            const dmg = a.damage + a.laserStack;
+            applyDamageToEnemyTower(targetTw, dmg);
+            pulses.push({x:a.x,y:a.y,r:0,maxR:Math.min(260, a.range),alpha:0.28,kind:"laser"});
+          }else{
+            allyBullets.push({
+              x:a.x,y:a.y, targetKind:"enemyTower", targetId:targetTw.id,
+              tx:targetTw.x, ty:targetTw.y, speed:a.bulletSpeed,
+              damage:a.damage, splashRadius:a.splashRadius||0
+            });
+          }
+          a.cooldown=a.atkRate;
+        }else if(canHitCore){
+          if(a.mode==="melee"){
+            if(a.coreStrikesLeft>0 && a.coreCooldown<=0){
+              applyDamageToCore(a.damage);
+              a.coreStrikesLeft--;
+              a.coreCooldown = Math.max(8, Math.floor(a.atkRate*0.55));
+              pulses.push({x:enemyCore.x,y:enemyCore.y,r:0,maxR:70,alpha:0.5,kind:"corePoke"});
+              if(a.coreStrikesLeft<=0){
+                allies.splice(i,1); // "몇번 공격하고 사라짐"
+                continue;
+              }
+            }
+          }else if(a.mode==="laser"){
+            const same = (a.laserTargetKind==="core");
+            if(!same){ a.laserTargetKind="core"; a.laserTargetId=0; a.laserStack=0; }
+            a.laserStack = Math.min(a.laserMax, a.laserStack + a.laserGrow*10);
+            const dmg = Math.max(1, Math.floor(a.damage + a.laserStack));
+            applyDamageToCore(dmg);
+            pulses.push({x:enemyCore.x,y:enemyCore.y,r:0,maxR:70,alpha:0.45,kind:"corePoke"});
+          }else{
+            allyBullets.push({
+              x:a.x,y:a.y, targetKind:"core", targetId:0,
+              tx:enemyCore.x, ty:enemyCore.y, speed:a.bulletSpeed,
+              damage:a.damage, splashRadius:a.splashRadius||0,
+              empSlow:a.empSlow||1, empDur:a.empDur||0
+            });
+          }
+          a.cooldown=a.atkRate;
+        }
+      }
+    }
+
+    // move toward enemy core: reverse along path (decrease index) (SS4: frontline hold)
+// allies advance until they reach the frontline, then they HOLD and fight there.
+const fi = getFrontlineIndex();
+if(a.pathIndex <= fi){
+  // 전선에 도달 - 사거리 내에 적이 있는지 확인
+  let hasTarget = false;
+  // 사거리 내 적 유닛 확인
+  for(const e of enemies){
+    if(dist(a,e) <= a.range){ hasTarget = true; break; }
+  }
+  // 사거리 내 적 타워 확인
+  if(!hasTarget){
+    for(const tw of enemyTowers){
+      if(dist(a,tw) <= a.range){ hasTarget = true; break; }
+    }
+  }
+  // 사거리 내 코어 확인
+  if(!hasTarget && enemyCore){
+    if(dist(a,enemyCore) <= a.range){ hasTarget = true; }
+  }
+  
+  // 적이 있으면 멈춤 (위치 유지), 없으면 아래로 계속 전진
+  if(hasTarget){
+    continue; // 멈춤 - 위치 변경 없음
+  }
+  // 적이 없으면 아래 코드로 계속 전진
+}
+
+// stop at index 0 region, don't warp
+const slow = (a.slowFactor||1);
+const moveSpeed = a.speed * slow;
+
+// if already near core tile
+if(a.pathIndex<=0){
+  // keep around core point
+  a.x = pathPoints[0].x;
+  a.y = pathPoints[0].y;
+  continue;
+}
+
+const from = pathPoints[a.pathIndex];
+const to = pathPoints[a.pathIndex-1];
+const dx=to.x-from.x, dy=to.y-from.y;
+const segLen=Math.sqrt(dx*dx+dy*dy)||1;
+
+a.progress += moveSpeed/segLen;
+if(a.progress>=1){
+  a.pathIndex--;
+  a.progress=0;
+}
+const base = pathPoints[a.pathIndex];
+const tgt  = pathPoints[a.pathIndex-1] || base;
+a.x = base.x + (tgt.x-base.x)*a.progress;
+a.y = base.y + (tgt.y-base.y)*a.progress;
+  }
+}
+
+function updateProjectiles(){
+  // player tower bullets
+  for(let i=bullets.length-1;i>=0;i--){
+    const b=bullets[i];
+
+    let tx=b.tx, ty=b.ty;
+    if(b.targetKind==="enemy"){
+      const te = enemies.find(e=>e.id===b.targetId);
+      if(te){ tx=te.x; ty=te.y; b.tx=tx; b.ty=ty; }
+    }else if(b.targetKind==="enemyTower"){
+      const tw = enemyTowers.find(t=>t.id===b.targetId);
+      if(tw){ tx=tw.x; ty=tw.y; b.tx=tx; b.ty=ty; }
+    }else if(b.targetKind==="core"){
+      if(enemyCore){ tx=enemyCore.x; ty=enemyCore.y; b.tx=tx; b.ty=ty; }
+    }
+
+    const dx=tx-b.x, dy=ty-b.y;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    b.x += (dx/len)*b.speed;
+    b.y += (dy/len)*b.speed;
+
+    if(Math.sqrt((tx-b.x)**2+(ty-b.y)**2) < 10){
+      if(b.splashRadius>0){
+        const hitPoint={x:b.x,y:b.y};
+        // affect enemies
+        for(const e of enemies){
+          if(dist(hitPoint,e)<=b.splashRadius){
+            applyDamageToEnemy(e, b.damage, b.slowFactor, b.slowDuration, b.poisonDps, b.poisonDuration);
+          }
+        }
+        // affect enemy towers
+        for(const tw of enemyTowers){
+          if(dist(hitPoint,tw)<=b.splashRadius){
+            applyDamageToEnemyTower(tw, b.damage, b.slowFactor, b.slowDuration);
+          }
+        }
+        // core
+        if(enemyCore && dist(hitPoint,enemyCore)<=b.splashRadius){
+          applyDamageToCore(Math.floor(b.damage*0.55));
+        }
+      }else{
+        if(b.targetKind==="enemy"){
+          const te = enemies.find(e=>e.id===b.targetId);
+          if(te) applyDamageToEnemy(te, b.damage, b.slowFactor, b.slowDuration, b.poisonDps, b.poisonDuration);
+        }else if(b.targetKind==="enemyTower"){
+          const tw = enemyTowers.find(t=>t.id===b.targetId);
+          if(tw) applyDamageToEnemyTower(tw, b.damage, b.slowFactor, b.slowDuration);
+        }else{
+          applyDamageToCore(b.damage);
+        }
+      }
+      bullets.splice(i,1);
+    }
+  }
+
+  // ally bullets
+  for(let i=allyBullets.length-1;i>=0;i--){
+    const b=allyBullets[i];
+    let tx=b.tx, ty=b.ty;
+
+    if(b.targetKind==="enemy"){
+      const te=enemies.find(e=>e.id===b.targetId);
+      if(te){ tx=te.x; ty=te.y; b.tx=tx; b.ty=ty; }
+    }else if(b.targetKind==="enemyTower"){
+      const tw=enemyTowers.find(t=>t.id===b.targetId);
+      if(tw){ tx=tw.x; ty=tw.y; b.tx=tx; b.ty=ty; }
+    }else if(b.targetKind==="core"){
+      if(enemyCore){ tx=enemyCore.x; ty=enemyCore.y; b.tx=tx; b.ty=ty; }
+    }
+
+    const dx=tx-b.x, dy=ty-b.y;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    b.x += (dx/len)*b.speed;
+    b.y += (dy/len)*b.speed;
+
+    if(Math.sqrt((tx-b.x)**2+(ty-b.y)**2) < 10){
+      if(b.targetKind==="core"){
+        applyDamageToCore(b.damage);
+      }else if(b.targetKind==="enemy"){
+        if(b.splashRadius>0){
+          const hitPoint={x:b.x,y:b.y};
+          for(const e of enemies){
+            if(dist(hitPoint,e)<=b.splashRadius) applyDamageToEnemy(e, b.damage);
+          }
+        }else{
+          const te=enemies.find(e=>e.id===b.targetId);
+          if(te){
+            applyDamageToEnemy(te, b.damage);
+            // EMP special
+            if(b.empDur){
+              applySlow(te, b.empSlow||0.6, b.empDur);
+              te.atkCooldown = Math.max(te.atkCooldown, 18);
+              pulses.push({x:te.x,y:te.y,r:0,maxR:120,alpha:0.6,kind:"emp"});
+            }
+          }
+        }
+      }else if(b.targetKind==="enemyTower"){
+        const tw=enemyTowers.find(t=>t.id===b.targetId);
+        if(tw){
+          applyDamageToEnemyTower(tw, b.damage);
+          if(b.empDur){
+            applySlow(tw, b.empSlow||0.6, b.empDur);
+            tw.cooldown = Math.max(tw.cooldown, 20);
+            pulses.push({x:tw.x,y:tw.y,r:0,maxR:140,alpha:0.6,kind:"emp"});
+          }
+        }
+      }
+      allyBullets.splice(i,1);
+    }
+  }
+
+  // enemy unit bullets
+  for(let i=enemyBullets.length-1;i>=0;i--){
+    const b=enemyBullets[i];
+    let tx=b.tx, ty=b.ty;
+
+    if(b.targetKind==="tower"){
+      const t=towers.find(x=>x.id===b.targetId);
+      if(t){ tx=t.x; ty=t.y; b.tx=tx; b.ty=ty; }
+    }else{
+      const a=allies.find(x=>x.id===b.targetId);
+      if(a){ tx=a.x; ty=a.y; b.tx=tx; b.ty=ty; }
+    }
+
+    const dx=tx-b.x, dy=ty-b.y;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    b.x += (dx/len)*b.speed;
+    b.y += (dy/len)*b.speed;
+
+    if(Math.sqrt((tx-b.x)**2+(ty-b.y)**2) < 10){
+      const hitPoint={x:b.x,y:b.y};
+      for(let j=allies.length-1;j>=0;j--){
+        const a=allies[j];
+        if(dist(hitPoint,a)<=b.splashRadius){
+          a.hp -= b.damage;
+          if(a.hp<=0) allies.splice(j,1);
+        }
+      }
+      for(let j=towers.length-1;j>=0;j--){
+        const t=towers[j];
+        if(dist(hitPoint,t)<=b.splashRadius){
+          t.hp -= b.damage;
+        }
+      }
+      enemyBullets.splice(i,1);
+    }
+  }
+
+  // enemy tower bullets (separate for clarity)
+  for(let i=enemyTowerBullets.length-1;i>=0;i--){
+    const b=enemyTowerBullets[i];
+    let tx=b.tx, ty=b.ty;
+
+    if(b.targetKind==="tower"){
+      const t=towers.find(x=>x.id===b.targetId);
+      if(t){ tx=t.x; ty=t.y; b.tx=tx; b.ty=ty; }
+    }else{
+      const a=allies.find(x=>x.id===b.targetId);
+      if(a){ tx=a.x; ty=a.y; b.tx=tx; b.ty=ty; }
+    }
+
+    const dx=tx-b.x, dy=ty-b.y;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    b.x += (dx/len)*b.speed;
+    b.y += (dy/len)*b.speed;
+
+    if(Math.sqrt((tx-b.x)**2+(ty-b.y)**2) < 10){
+      const hitPoint={x:b.x,y:b.y};
+      for(let j=allies.length-1;j>=0;j--){
+        const a=allies[j];
+        if(dist(hitPoint,a)<=b.splashRadius){
+          a.hp -= b.damage;
+          if(b.slowDuration) applySlow(a, b.slowFactor||0.6, b.slowDuration);
+          if(a.hp<=0) allies.splice(j,1);
+        }
+      }
+      for(let j=towers.length-1;j>=0;j--){
+        const t=towers[j];
+        if(dist(hitPoint,t)<=b.splashRadius){
+          t.hp -= b.damage;
+          if(b.slowDuration) applySlow(t, b.slowFactor||0.7, b.slowDuration);
+        }
+      }
+      enemyTowerBullets.splice(i,1);
+    }
+  }
+}
+
+function updatePulses(){
+  for(let i=pulses.length-1;i>=0;i--){
+    const p=pulses[i];
+    p.r += 6;
+    p.alpha -= 0.03;
+    if(p.alpha<=0 || p.r>p.maxR) pulses.splice(i,1);
+  }
+}
+
+/* render */
+function drawBackground(){
+  resetTransform();
+  const g=ctx.createRadialGradient(CW*0.5, CH*0.12, 60, CW*0.5, CH*0.5, CW*0.95);
+  g.addColorStop(0,"#1a1d4f");
+  g.addColorStop(0.45,"#050119");
+  g.addColorStop(1,"#020008");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,CW,CH);
+
+  // stars
+  for(const s of stars){
+    const tw = 0.4 + Math.sin(tick*0.04*s.t)*0.3;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r + tw*0.85, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(240,248,255,${0.28+tw})`;
+    ctx.fill();
+  }
+}
+
+function drawWorld(){
+  setWorldTransform();
+
+  // subtle ground tiles (맵이 "안 보이는" 느낌 방지)
+  ctx.save();
+  for(let y=0;y<ROWS;y++){
+    for(let x=0;x<COLS;x++){
+      const c = grid[y][x];
+      const px=x*TILE, py=y*TILE;
+      if(c.isPath){
+        ctx.fillStyle = "rgba(74,242,197,0.06)";
+      }else{
+        ctx.fillStyle = "rgba(120,140,255,0.03)";
+      }
+      ctx.fillRect(px,py,TILE,TILE);
+    }
+  }
+  ctx.restore();
+
+  // grid lines
+  ctx.save();
+  ctx.strokeStyle="rgba(120,140,255,0.10)";
+  ctx.lineWidth=1;
+  for(let x=0;x<=COLS;x++){
+    ctx.beginPath(); ctx.moveTo(x*TILE,0); ctx.lineTo(x*TILE,ROWS*TILE); ctx.stroke();
+  }
+  for(let y=0;y<=ROWS;y++){
+    ctx.beginPath(); ctx.moveTo(0,y*TILE); ctx.lineTo(COLS*TILE,y*TILE); ctx.stroke();
+  }
+  ctx.restore();
+
+  // path glow
+  ctx.save();
+  ctx.strokeStyle="rgba(74,242,197,0.62)";
+  ctx.lineWidth=Math.max(16, TILE*0.42);
+  ctx.lineCap="round";
+  ctx.shadowColor="rgba(74,242,197,0.75)";
+  ctx.shadowBlur=14;
+  ctx.beginPath();
+  for(let i=0;i<pathPoints.length;i++){
+    const p=pathPoints[i];
+    if(i===0) ctx.moveTo(p.x,p.y);
+    else ctx.lineTo(p.x,p.y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Frontline marker - 전투선 표시 (실제 위치 기반) - 주석 처리
+  /*
+  ctx.save();
+  const fp = getFrontlinePosition();
+  ctx.translate(fp.x, fp.y);
+  
+  // 펄싱 효과
+  const pulseTime = (Date.now() * 0.002) % 1;
+  const pulseScale = 1 + Math.sin(pulseTime * Math.PI * 2) * 0.15;
+  
+  // 적 진영 쪽 (빨강)
+  ctx.beginPath();
+  ctx.arc(-35, 0, 18 * pulseScale, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,75,129,0.4)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,75,129,0.8)";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // 아군 진영 쪽 (청록)
+  ctx.beginPath();
+  ctx.arc(35, 0, 18 * pulseScale, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(74,242,197,0.4)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(74,242,197,0.8)";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // 중앙 전선 라인
+  ctx.shadowColor = "rgba(255,210,80,0.95)";
+  ctx.shadowBlur = 22;
+  ctx.beginPath();
+  ctx.moveTo(0, -50);
+  ctx.lineTo(0, 50);
+  ctx.strokeStyle = "rgba(255,210,80,0.75)";
+  ctx.lineWidth = 6;
+  ctx.stroke();
+  
+  // 중앙 점
+  ctx.beginPath();
+  ctx.arc(0, 0, 12, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,210,80,0.95)";
+  ctx.fill();
+  ctx.restore();
+  */
+
+
+  // cores
+  if(enemyCore){
+    ctx.save();
+    ctx.translate(enemyCore.x, enemyCore.y);
+    ctx.shadowColor="#ff4b81";
+    ctx.shadowBlur=22;
+
+    ctx.beginPath();
+    ctx.arc(0,0,22,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,75,129,0.92)";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0,0,36,0,Math.PI*2);
+    ctx.strokeStyle="rgba(255,75,129,0.36)";
+    ctx.lineWidth=5;
+    ctx.stroke();
+    ctx.restore();
+
+    const barW=210, barH=9;
+    const r = enemyCore.hp/enemyCore.maxHp;
+    ctx.fillStyle="rgba(0,0,0,0.6)";
+    ctx.fillRect(enemyCore.x-barW/2, enemyCore.y-60, barW, barH);
+    ctx.fillStyle="#ff4b81";
+    ctx.fillRect(enemyCore.x-barW/2, enemyCore.y-60, barW*Math.max(0,r), barH);
+  }
+
+  if(playerCore){
+    ctx.save();
+    ctx.translate(playerCore.x, playerCore.y);
+    ctx.shadowColor="#4af2c5";
+    ctx.shadowBlur=18;
+    ctx.beginPath();
+    ctx.arc(0,0,18,0,Math.PI*2);
+    ctx.fillStyle="rgba(74,242,197,0.9)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0,0,30,0,Math.PI*2);
+    ctx.strokeStyle="rgba(74,242,197,0.25)";
+    ctx.lineWidth=4;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // pulses
+  ctx.save();
+  for(const p of pulses){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    let col="rgba(255,235,130,";
+    if(p.kind==="towerHeal") col="rgba(102,255,196,";
+    if(p.kind==="allyHeal")  col="rgba(100,220,255,";
+    if(p.kind==="enemyHeal") col="rgba(129,212,250,";
+    if(p.kind==="coreHit")   col="rgba(255,75,129,";
+    if(p.kind==="synergy")   col="rgba(74,242,197,";
+    if(p.kind==="melee")     col="rgba(255,255,255,";
+    if(p.kind==="redPulse")  col="rgba(255,75,129,";
+    if(p.kind==="enemyBuild")col="rgba(255,235,130,";
+    if(p.kind==="emp")       col="rgba(144,202,249,";
+    if(p.kind==="corePoke")  col="rgba(255,255,255,";
+    ctx.strokeStyle = col + p.alpha + ")";
+    ctx.lineWidth=3;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // projectiles
+  ctx.save();
+  ctx.lineWidth=2;
+  ctx.shadowBlur=14;
+
+  ctx.shadowColor="#f8ffff";
+  for(const b of bullets){
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    ctx.lineTo(b.x+(b.tx-b.x)*0.35, b.y+(b.ty-b.y)*0.35);
+    let c="#f8fdff";
+    if(b.towerType==="rail") c="#b3ffff";
+    else if(b.towerType==="missile") c="#ffcc80";
+    else if(b.towerType==="slow") c="#b39ddb";
+    else if(b.towerType==="poison") c="#a5d6a7";
+    else if(b.towerType==="tachyon") c="#ffffff";
+    ctx.strokeStyle=c;
+    ctx.stroke();
+  }
+
+  ctx.shadowColor="#c8ffff";
+  for(const b of allyBullets){
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    ctx.lineTo(b.x+(b.tx-b.x)*0.35, b.y+(b.ty-b.y)*0.35);
+    ctx.strokeStyle = (b.targetKind==="core") ? "#ffb3c7" : "#e8ffff";
+    ctx.stroke();
+  }
+
+  ctx.shadowColor="#ff6b6b";
+  for(const b of enemyBullets){
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    ctx.lineTo(b.x+(b.tx-b.x)*0.35, b.y+(b.ty-b.y)*0.35);
+    ctx.strokeStyle="#ff6b6b";
+    ctx.stroke();
+  }
+
+  ctx.shadowColor="#ff6b6b";
+  for(const b of enemyTowerBullets){
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    ctx.lineTo(b.x+(b.tx-b.x)*0.35, b.y+(b.ty-b.y)*0.35);
+    ctx.strokeStyle="#ff8aa8";
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // enemy units (SS4: rounded bio forms)
+  for(const e of enemies){
+    ctx.save();
+    ctx.translate(e.x,e.y);
+    const from=pathPoints[e.pathIndex];
+    const to=pathPoints[e.pathIndex+1]||from;
+    const ang=Math.atan2(to.y-from.y,to.x-from.x);
+    ctx.rotate(ang);
+
+    // size by type
+    const big = (e.type==="boss"||e.type==="carrier");
+    const size =
+      (e.type==="larva") ? 10 :
+      (e.type==="swarm") ? 12 :
+      (e.type==="cluster") ? 18 :
+      (e.type==="bulb") ? 22 :
+      (e.type==="brute") ? 24 :
+      (e.type==="juggernaut"||e.type==="tank") ? 22 :
+      (e.type==="bomber") ? 18 :
+      (e.type==="sniper") ? 16 :
+      (e.type==="mut_marine") ? 16 :
+      (big ? 30 : 16);
+
+    // 촉수 애니메이션
+    const tentacleCount = big ? 8 : 5;
+    const t = Date.now() * 0.001;
+    ctx.save();
+    ctx.strokeStyle = e.color;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.5;
+    for(let i = 0; i < tentacleCount; i++) {
+      const angle = (i / tentacleCount) * Math.PI * 2 + t * 0.5;
+      const wave = Math.sin(t * 3 + i) * 0.3;
+      const length = size * (1.2 + wave);
+      const segments = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      for(let j = 1; j <= segments; j++) {
+        const progress = j / segments;
+        const segAngle = angle + Math.sin(t * 2 + i + progress * 2) * 0.4;
+        const segLen = length * progress;
+        const px = Math.cos(segAngle) * segLen;
+        const py = Math.sin(segAngle) * segLen;
+        ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.shadowColor=e.color;
+    ctx.shadowBlur=18;
+
+    // main body
+    ctx.beginPath();
+    if(e.type==="larva"){
+      // small ellipse (sometimes double)
+      ctx.ellipse(0,0,size*1.15,size*0.75,0,0,Math.PI*2);
+      ctx.fillStyle=e.color; ctx.fill();
+      if((e.id%3)===0){
+        ctx.beginPath();
+        ctx.ellipse(-size*0.75, size*0.15, size*0.65, size*0.45, 0, 0, Math.PI*2);
+        ctx.fillStyle="rgba(255,255,255,0.15)"; ctx.fill();
+      }
+    }else if(e.type==="bulb"){
+      ctx.arc(0,0,size,0,Math.PI*2);
+      ctx.fillStyle=e.color; ctx.fill();
+      // two small bulbs
+      for(const sgn of [-1,1]){
+        ctx.beginPath();
+        ctx.arc(-size*0.55, sgn*size*0.55, size*0.38, 0, Math.PI*2);
+        ctx.fillStyle="rgba(255,255,255,0.18)";
+        ctx.fill();
+      }
+    }else if(e.type==="cluster"){
+      const n=4 + (e.id%3); // 4~6
+      for(let i=0;i<n;i++){
+        const a=(Math.PI*2/n)*i;
+        const rr=size*0.55;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a)*rr, Math.sin(a)*rr, size*0.55, 0, Math.PI*2);
+        ctx.fillStyle = i===0 ? e.color : "rgba(255,255,255,0.12)";
+        ctx.fill();
+      }
+    }else{
+      // generic rounded body
+      ctx.ellipse(0,0,size*1.05,size*0.88,0,0,Math.PI*2);
+      ctx.fillStyle=e.color; ctx.fill();
+      // spitter spikes
+      if(e.type==="spitter"){
+        for(let i=0;i<6;i++){
+          const a=(Math.PI*2/6)*i;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a)*size*0.9, Math.sin(a)*size*0.9, 3, 0, Math.PI*2);
+          ctx.fillStyle="rgba(0,0,0,0.18)";
+          ctx.fill();
+        }
+      }
+      // mutated marine hint (visor line)
+      if(e.type==="mut_marine"){
+        ctx.beginPath();
+        ctx.ellipse(size*0.15,0,size*0.55,size*0.22,0,0,Math.PI*2);
+        ctx.fillStyle="rgba(0,0,0,0.22)";
+        ctx.fill();
+      }
+    }
+
+    // outline
+    ctx.lineWidth=2;
+    ctx.strokeStyle="rgba(0,0,0,0.35)";
+    ctx.stroke();
+
+    // shield bubble
+    if(e.shieldHp>0){
+      const rr=e.shieldHp/e.shieldMax;
+      ctx.beginPath();
+      ctx.arc(0,0,size+4+rr*5,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(163,139,255,${0.35+rr*0.45})`;
+      ctx.lineWidth=2;
+      ctx.setLineDash([6,4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+
+    // hp bar
+    const bw = big?66:34;
+    const r=e.hp/e.maxHp;
+    ctx.fillStyle="rgba(0,0,0,0.6)";
+    ctx.fillRect(e.x-bw/2, e.y-36, bw, 5);
+    ctx.fillStyle="#4af2c5";
+    ctx.fillRect(e.x-bw/2, e.y-36, bw*Math.max(0,r), 5);
+  }
+
+  // enemy towers (red hex) (red hex)
+  for(const tw of enemyTowers){
+    ctx.save();
+    ctx.translate(tw.x, tw.y);
+
+    ctx.beginPath();
+    ctx.arc(0,0,tw.range,0,Math.PI*2);
+    ctx.strokeStyle="rgba(255,75,129,0.06)";
+    ctx.lineWidth=1;
+    ctx.stroke();
+
+    ctx.rotate(tw.spin);
+    ctx.shadowColor="rgba(255,75,129,0.9)";
+    ctx.shadowBlur=16;
+
+    const r=18;
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      const a=(Math.PI*2/6)*i;
+      const x=Math.cos(a)*r;
+      const y=Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle="rgba(255,75,129,0.88)";
+    ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,0.35)";
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.restore();
+
+    const bw=34;
+    const rr=tw.hp/tw.maxHp;
+    ctx.fillStyle="rgba(0,0,0,0.7)";
+    ctx.fillRect(tw.x-bw/2, tw.y+22, bw, 4);
+    ctx.fillStyle = rr>0.35 ? "#ffb3c7" : "#ff4b81";
+    ctx.fillRect(tw.x-bw/2, tw.y+22, bw*Math.max(0,rr), 4);
+  }
+
+  // player towers (cyan circles)
+  for(const t of towers){
+    ctx.save();
+    ctx.translate(t.x,t.y);
+
+    ctx.beginPath();
+    ctx.arc(0,0,t.range,0,Math.PI*2);
+    ctx.strokeStyle="rgba(90,140,255,0.08)";
+    ctx.lineWidth=1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(0,0,20,0,Math.PI*2);
+
+    const grad = ctx.createRadialGradient(0,0,0,0,0,20);
+    if(t.typeId==="rail"){ grad.addColorStop(0,"#fff"); grad.addColorStop(0.5,"#57f2ff"); grad.addColorStop(1,"#1b2460"); }
+    else if(t.typeId==="missile"){ grad.addColorStop(0,"#ffe082"); grad.addColorStop(0.5,"#ff7043"); grad.addColorStop(1,"#351318"); }
+    else if(t.typeId==="slow"){ grad.addColorStop(0,"#e0e0ff"); grad.addColorStop(0.5,"#7e57c2"); grad.addColorStop(1,"#2a1748"); }
+    else if(t.typeId==="pulse"){ grad.addColorStop(0,"#fff3e0"); grad.addColorStop(0.5,"#ffca28"); grad.addColorStop(1,"#4e342e"); }
+    else if(t.typeId==="poison"){ grad.addColorStop(0,"#e8f5e9"); grad.addColorStop(0.5,"#81c784"); grad.addColorStop(1,"#1b5e20"); }
+    else if(t.typeId==="heal"){ grad.addColorStop(0,"#e0fff4"); grad.addColorStop(0.5,"#66ffc4"); grad.addColorStop(1,"#184636"); }
+    else if(t.typeId==="tachyon"){ grad.addColorStop(0,"#ffffff"); grad.addColorStop(0.5,"#c8ffff"); grad.addColorStop(1,"#2b2f66"); }
+    else { grad.addColorStop(0,"#4af2c5"); grad.addColorStop(0.6,"#1d8cff"); grad.addColorStop(1,"rgba(10,10,40,0.6)"); }
+
+    ctx.fillStyle=grad;
+    ctx.shadowColor="#4af2c5";
+    ctx.shadowBlur=18;
+    ctx.fill();
+
+    ctx.rotate(t.spin);
+    ctx.beginPath();
+    ctx.arc(0,0,12,0,Math.PI*2);
+    ctx.strokeStyle="rgba(250,255,255,0.92)";
+    ctx.lineWidth=2;
+    ctx.setLineDash([6,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    const bw=32;
+    const rr=t.hp/t.maxHp;
+    ctx.fillStyle="rgba(0,0,0,0.7)";
+    ctx.fillRect(t.x-bw/2, t.y+22, bw, 4);
+    ctx.fillStyle = rr>0.4 ? "#4af2c5" : "#ff4b81";
+    ctx.fillRect(t.x-bw/2, t.y+22, bw*Math.max(0,rr), 4);
+  }
+
+  // allies (US units: keep SS3 feel, but allow special silhouettes)
+  for(const a of allies){
+    ctx.save();
+    ctx.translate(a.x,a.y);
+    const from=pathPoints[a.pathIndex];
+    const to=pathPoints[Math.max(0,a.pathIndex-1)]||from;
+    const ang=Math.atan2(to.y-from.y,to.x-from.x);
+    ctx.rotate(ang);
+
+    ctx.shadowBlur=18;
+    ctx.shadowColor="rgba(100,220,255,0.95)";
+
+    const size =
+      (a.typeId==="sniperU") ? 16 :
+      (a.typeId==="bomberU") ? 18 :
+      (a.typeId==="guardian") ? 20 :
+      (a.typeId==="tankU") ? 20 :
+      15;
+
+    // body: default triangle (legacy), but special shapes for new units
+    if(a.typeId==="tankU"){
+      ctx.beginPath();
+      ctx.rect(-size*1.0, -size*0.6, size*2.0, size*1.2);
+      ctx.fillStyle="rgba(120,220,255,0.96)";
+      ctx.fill();
+      // cannon
+      ctx.beginPath();
+      ctx.rect(size*0.2, -4, size*1.0, 8);
+      ctx.fillStyle="rgba(255,255,255,0.35)";
+      ctx.fill();
+    }else if(a.typeId==="pentagonU"){
+      ctx.beginPath();
+      const r=size*1.05;
+      for(let i=0;i<5;i++){
+        const aa=(Math.PI*2/5)*i - Math.PI/2;
+        const x=Math.cos(aa)*r;
+        const y=Math.sin(aa)*r;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.fillStyle="rgba(120,220,255,0.98)";
+      ctx.fill();
+    }else if(a.typeId==="droneU" || a.typeId==="marineU" || a.typeId==="rocketU"){
+      ctx.beginPath();
+      ctx.ellipse(0,0,size*1.05,size*0.85,0,0,Math.PI*2);
+      ctx.fillStyle="rgba(120,220,255,0.98)";
+      ctx.fill();
+      // rocket has small pods
+      if(a.typeId==="rocketU"){
+        for(const sgn of [-1,1]){
+          ctx.beginPath();
+          ctx.arc(-size*0.75, sgn*size*0.45, 4, 0, Math.PI*2);
+          ctx.fillStyle="rgba(255,255,255,0.25)";
+          ctx.fill();
+        }
+      }
+    }else{
+      ctx.beginPath();
+      ctx.moveTo(size,0);
+      ctx.lineTo(-size*0.8,-size*0.7);
+      ctx.lineTo(-size*0.8, size*0.7);
+      ctx.closePath();
+      ctx.fillStyle="rgba(120,220,255,0.98)";
+      ctx.fill();
+    }
+
+    // outline
+    ctx.strokeStyle="rgba(255,255,255,0.55)";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    // medic cross
+    if(a.typeId==="medicU"){
+      ctx.beginPath(); ctx.rect(-5,-8,10,16); ctx.rect(-8,-5,16,10);
+      ctx.fillStyle="rgba(74,242,197,0.95)";
+      ctx.fill();
+    }
+    // guardian shield mark
+    if(a.typeId==="guardian"){
+      ctx.beginPath();
+      ctx.arc(-2,0,6,0,Math.PI*2);
+      ctx.fillStyle="rgba(255,255,255,0.35)";
+      ctx.fill();
+    }
+    // emp mark
+    if(a.typeId==="emp"){
+      ctx.beginPath();
+      ctx.moveTo(-4,-8); ctx.lineTo(2,-2); ctx.lineTo(-2,-2); ctx.lineTo(4,8); ctx.lineTo(-2,2); ctx.lineTo(2,2);
+      ctx.closePath();
+      ctx.fillStyle="rgba(144,202,249,0.85)";
+      ctx.fill();
+    }
+
+    ctx.restore();
+
+    const bw=34;
+    const rr=a.hp/a.maxHp;
+    ctx.fillStyle="rgba(0,0,0,0.65)";
+    ctx.fillRect(a.x-bw/2, a.y-34, bw, 4);
+    ctx.fillStyle="rgba(100,220,255,0.98)";
+    ctx.fillRect(a.x-bw/2, a.y-34, bw*Math.max(0,rr), 4);
+  }
+
+  // hover tile hint
+  if(mouse.tx>=0 && mouse.ty>=0){
+    const x=mouse.tx*TILE, y=mouse.ty*TILE;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x+1,y+1,TILE-2,TILE-2);
+    const ok=mouse.ok;
+    const isUnit = (mode==="unit");
+    ctx.fillStyle = ok
+      ? (isUnit ? "rgba(100,220,255,0.14)" : "rgba(74,242,197,0.16)")
+      : "rgba(255,75,129,0.13)";
+    ctx.strokeStyle = ok
+      ? (isUnit ? "rgba(100,220,255,0.75)" : "rgba(74,242,197,0.75)")
+      : "rgba(255,75,129,0.75)";
+    ctx.lineWidth=2.0;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  resetTransform();
+}
+
+function drawOverlay(){
+  resetTransform();
+  if(gameOver || victory){
+    ctx.save();
+    ctx.fillStyle="rgba(5,0,20,0.80)";
+    ctx.fillRect(0,0,CW,CH);
+
+    ctx.textAlign="center";
+    ctx.fillStyle = victory ? "#4af2c5" : "#ff4b81";
+    ctx.font="900 54px system-ui";
+    ctx.fillText(victory ? "MISSION CLEAR" : "MISSION FAILED", CW/2, CH/2 - 18);
+
+    ctx.fillStyle="#f4f8ff";
+    ctx.font="16px system-ui";
+    ctx.fillText("R 키/버튼으로 재시작 · 맵 선택에서 다음 진행", CW/2, CH/2 + 22);
+    ctx.restore();
+  }else{
+    // small HUD
+    ctx.save();
+    ctx.fillStyle="rgba(0,0,0,0.25)";
+    ctx.fillRect(12, 12, 300, 94);
+    ctx.strokeStyle="rgba(110,144,255,0.35)";
+    ctx.strokeRect(12,12,300,94);
+    ctx.fillStyle="#eaf0ff";
+    ctx.font="12px system-ui";
+    ctx.fillText(`모드: ${mode==="tower"?"설치":"소환"} · 웨이브: ${waveInProgress?"진행":"대기"}`, 22, 36);
+    ctx.fillStyle="rgba(255,255,255,0.75)";
+    ctx.fillText(`RED 방어자원: ${Math.floor(redEnergy)}`, 22, 56);
+    ctx.fillText(`전선: ${Math.floor(frontline)}% · 최소 소환 지점: #${frontlineSpawnMinPi()}`, 22, 74);
+    ctx.fillText(`팁: +소환은 웨이브 중에만`, 22, 90);
+    ctx.restore();
+  }
+}
+
+function loop(){
+  tick++;
+
+  if(!gameOver && !victory){
+    updateEnemies();
+    updateEnemyTowers();
+    updateAllies();
+    updateTowers();
+    updateProjectiles();
+    updatePulses();
+  }
+
+  refreshUI();
+  drawBackground();
+  drawWorld();
+  drawOverlay();
+
+  requestAnimationFrame(loop);
+}
+
+/* input / hover / tap */
+function computeHover(clientX,clientY){
+  const {sx,sy}=clientToCanvas(clientX,clientY);
+  const w=screenToWorld(sx,sy);
+  const tx0=Math.floor(w.x/TILE);
+  const ty0=Math.floor(w.y/TILE);
+
+  if(!isInside(tx0,ty0)){
+    mouse.tx=-1; mouse.ty=-1; mouse.ok=false;
+    return;
+  }
+
+  if(mode==="unit"){
+    // for unit: nearest path index
+    const pi=findNearestPathIndex(tx0,ty0,4);
+    if(pi>=0){
+      const pt=pathTiles[pi];
+      mouse.tx=pt.x; mouse.ty=pt.y; mouse.ok=true;
+    }else{
+      mouse.tx=tx0; mouse.ty=ty0; mouse.ok=false;
+    }
+  }else{
+    // for tower: nearest valid empty
+    const p=findNearestValidTowerTile(tx0,ty0,3);
+    if(p){ mouse.tx=p.tx; mouse.ty=p.ty; mouse.ok=true; }
+    else { mouse.tx=tx0; mouse.ty=ty0; mouse.ok=false; }
+  }
+}
+
+function handleTap(clientX,clientY){
+  if(gameOver||victory) return;
+
+  const {sx,sy}=clientToCanvas(clientX,clientY);
+  const w=screenToWorld(sx,sy);
+  const tx0=Math.floor(w.x/TILE);
+  const ty0=Math.floor(w.y/TILE);
+  if(!isInside(tx0,ty0)) return;
+
+  if(mode==="unit"){
+    const pi=findNearestPathIndex(tx0,ty0,5);
+    if(pi<0){ setStatus("소환 모드: 경로(길) 근처를 탭하세요.", "warn"); return; }
+    spawnAllyAtPathIndex(pi);
+  }else{
+    const p=findNearestValidTowerTile(tx0,ty0,4);
+    if(!p){ setStatus("설치 가능한 칸이 없습니다(주변).", "warn"); return; }
+    placeTowerAtTile(p.tx,p.ty);
+  }
+}
+
+/* pan / zoom */
+let isPanning=false;
+let panStart={sx:0,sy:0,ox:0,oy:0};
+function startPan(clientX,clientY){
+  const {sx,sy}=clientToCanvas(clientX,clientY);
+  isPanning=true;
+  panStart={sx,sy,ox:view.ox,oy:view.oy};
+}
+function movePan(clientX,clientY){
+  if(!isPanning) return;
+  const {sx,sy}=clientToCanvas(clientX,clientY);
+  view.ox = panStart.ox + (sx - panStart.sx);
+  view.oy = panStart.oy + (sy - panStart.sy);
+  clampCamera();
+}
+function endPan(){ isPanning=false; }
+
+canvas.addEventListener("mousemove",(e)=>computeHover(e.clientX,e.clientY));
+canvas.addEventListener("mouseleave",()=>{mouse.tx=-1; mouse.ty=-1; mouse.ok=false;});
+
+let dragging=false;
+let downPos=null;
+const dragThreshold=7;
+
+canvas.addEventListener("mousedown",(e)=>{
+  downPos={x:e.clientX,y:e.clientY};
+  dragging=false;
+  startPan(e.clientX,e.clientY);
+});
+window.addEventListener("mousemove",(e)=>{
+  if(!isPanning) return;
+  const dx=Math.abs(e.clientX-downPos.x), dy=Math.abs(e.clientY-downPos.y);
+  if(dx+dy>dragThreshold) dragging=true;
+  movePan(e.clientX,e.clientY);
+});
+window.addEventListener("mouseup",()=>{ if(isPanning) endPan(); });
+
+canvas.addEventListener("click",(e)=>{
+  if(dragging) return;
+  computeHover(e.clientX,e.clientY);
+  handleTap(e.clientX,e.clientY);
+});
+
+canvas.addEventListener("wheel",(e)=>{
+  const {sx,sy}=clientToCanvas(e.clientX,e.clientY);
+  const before=screenToWorld(sx,sy);
+  const factor = e.deltaY>0 ? 0.92 : 1.08;
+  view.scale = clamp(view.scale*factor, 0.22, 1.55);
+  view.ox = sx - before.x*view.scale;
+  view.oy = sy - before.y*view.scale;
+  clampCamera();
+  e.preventDefault();
+},{passive:false});
+
+// touch: 1-finger pan/tap, 2-finger pinch
+let touchMode="none";
+let lastTouch=null;
+let pinchStart=null;
+
+canvas.addEventListener("touchstart",(e)=>{
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    lastTouch={x:t.clientX,y:t.clientY};
+    startPan(t.clientX,t.clientY);
+    touchMode="pan";
+    computeHover(t.clientX,t.clientY);
+  }else if(e.touches.length===2){
+    touchMode="pinch";
+    const a=e.touches[0], b=e.touches[1];
+    const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY;
+    pinchStart={ dist:Math.sqrt(dx*dx+dy*dy), scale:view.scale };
+  }
+  e.preventDefault();
+},{passive:false});
+
+canvas.addEventListener("touchmove",(e)=>{
+  if(touchMode==="pan" && e.touches.length===1){
+    const t=e.touches[0];
+    movePan(t.clientX,t.clientY);
+    computeHover(t.clientX,t.clientY);
+  }else if(touchMode==="pinch" && e.touches.length===2){
+    const a=e.touches[0], b=e.touches[1];
+    const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    const ratio = d/(pinchStart?.dist||d);
+    view.scale = clamp((pinchStart?.scale||view.scale)*ratio, 0.22, 1.55);
+    clampCamera();
+  }
+  e.preventDefault();
+},{passive:false});
+
+canvas.addEventListener("touchend",(e)=>{
+  if(touchMode==="pan"){
+    const changed=e.changedTouches && e.changedTouches[0];
+    if(changed && lastTouch){
+      const dx=Math.abs(changed.clientX-lastTouch.x);
+      const dy=Math.abs(changed.clientY-lastTouch.y);
+      if(dx+dy<10){
+        computeHover(changed.clientX,changed.clientY);
+        handleTap(changed.clientX,changed.clientY);
+      }
+    }
+  }
+  endPan();
+  touchMode="none";
+  lastTouch=null;
+  pinchStart=null;
+  e.preventDefault();
+},{passive:false});
+
+/* keys */
+document.addEventListener("keydown",(e)=>{
+  const k=e.key;
+  if(k==="r"||k==="R"){
+    resetGameStateOnly();
+    placeInitialEnemyTowers();
+    setStatus("재시작!", "good");
+    return;
+  }
+  if(k===" "){
+    // space toggles mode
+    if(mode==="tower") setMode("unit"); else setMode("tower");
+    return;
+  }
+  if(k>="1" && k<="9"){
+    const idx=parseInt(k,10)-1;
+    if(idx>=0 && idx<towerTypes.length){
+      selectedTowerIndex=idx;
+      buildTowerBar();
+      setStatus(`타워 선택: ${towerTypes[idx].name}`, "good");
+    }
+    return;
+  }
+  const uk=k.toUpperCase();
+  const hot = unitTypes.findIndex(u=>u.hotkey===uk);
+  if(hot>=0){
+    selectedUnitIndex=hot;
+    buildUnitBar();
+    setStatus(`유닛 선택: ${unitTypes[hot].name}`, "good");
+    return;
+  }
+});
+
+/* buttons */
+function setMode(m){
+  mode=m;
+  if(mode==="tower"){
+    modeTowerBtn.classList.add("on");
+    modeUnitBtn.classList.remove("on");
+    setStatus("설치 모드: 빈칸 탭으로 타워 설치", "good");
+  }else{
+    modeUnitBtn.classList.add("on");
+    modeTowerBtn.classList.remove("on");
+    setStatus("소환 모드: 웨이브 중 경로 탭 또는 +소환", "good");
+  }
+}
+
+startWaveBtn.addEventListener("click", ()=> createWave());
+restartBtn.addEventListener("click", ()=>{
+  resetGameStateOnly();
+  placeInitialEnemyTowers();
+  setStatus("재시작!", "good");
+});
+storyBtn.addEventListener("click", ()=> showStory(currentEp));
+closeStoryBtn.addEventListener("click", hideStory);
+if(epilogueBtn){
+  epilogueBtn.addEventListener("click", ()=>fadeTo("ep.html"));
+}
+
+modalBack.addEventListener("click",(e)=>{ if(e.target===modalBack) hideStory(); });
+
+modeTowerBtn.addEventListener("click", ()=> setMode("tower"));
+modeUnitBtn.addEventListener("click", ()=> setMode("unit"));
+
+spawnBtn.addEventListener("click", ()=>{
+  // 버튼 소환은 "내 기지 근처(끝 쪽)" 기본
+  const pi = Math.max(0, pathPoints.length-1);
+  spawnAllyAtPathIndex(pi);
+});
+
+mapSelect.addEventListener("change", ()=>{
+  const [eidx, midx] = mapSelect.value.split(":").map(x=>parseInt(x,10));
+  initMapByEpAndIndex(eidx, midx, true);
+});
+
+/* boot */
+async function boot(){
+  [towerTypes, enemyTowerTypes, enemyConfigs, unitTypes, episodes, maps] = await Promise.all([
+    fetch(URLS.towers).then(r=>r.json()),
+    fetch(URLS.enemyTowers).then(r=>r.json()),
+    fetch(URLS.enemies).then(r=>r.json()),
+    fetch(URLS.units).then(r=>r.json()),
+    fetch(URLS.episodes).then(r=>r.json()),
+    fetch(URLS.maps).then(r=>r.json())
+  ]);
+
+  // ensure progress keys exist
+  const prog = loadProgress();
+  if(prog.unlockedMapByEpisode==null) prog.unlockedMapByEpisode={"0":0};
+  if(prog.unlockedMapByEpisode["0"]==null) prog.unlockedMapByEpisode["0"]=0;
+  saveProgress(prog);
+
+  buildTowerBar();
+  buildUnitBar();
+
+  // initialize canvas sizing AFTER layout
+  requestAnimationFrame(()=>{
+    resizeCanvas();
+    initStars();
+
+    // start at latest unlocked episode/map
+    const ue = clamp(prog.unlockedEpisode ?? 0, 0, episodes.length-1);
+    const um = clamp((prog.unlockedMapByEpisode[String(ue)] ?? 0), 0, 2);
+
+    rebuildMapSelect();
+    initMapByEpAndIndex(ue, um, true);
+
+    setMode("tower");
+    setStatus("대기 상태: ▶ 웨이브 시작을 눌러 진행하세요.", "good");
+    loop();
+  });
+}
+boot();
+</script>
+</body>
+</html>
