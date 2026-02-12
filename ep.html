@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StarShield 4 : Constantinople — Epilogue</title>
+<style>
+  :root{
+    --bg:#050014;
+    --text:#f4f8ff;
+    --sub:#a6b0ff;
+    --accent:#4af2c5;
+    --danger:#ff4b81;
+    --gold:#ffd166;
+    --panelA: rgba(8,12,34,.92);
+    --panelB: rgba(6,8,24,.92);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  html,body{height:100%}
+  body{
+    background: radial-gradient(circle at 18% 12%, #1b1f58 0%, #07001b 45%, #03000c 100%);
+    color:var(--text);
+    overflow:hidden;
+  }
+
+  @media (max-width: 860px), (max-height: 740px){
+    body{overflow:auto;-webkit-overflow-scrolling:touch;}
+    .wrap{align-items:flex-start; padding:14px 12px 28px; height:auto; min-height:100%;}
+    .card{margin-top:12px; margin-bottom:24px;}
+  }
+
+  #stars{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;}
+  .vignette{position:fixed;inset:-20%;z-index:1;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(0,0,0,0) 0 35%, rgba(0,0,0,.55) 60%, rgba(0,0,0,.92) 100%),
+      radial-gradient(circle at 80% 10%, rgba(74,242,197,.12) 0, rgba(0,0,0,0) 55%);
+  }
+  .scan{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.08;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,.15) 0 1px, rgba(0,0,0,0) 1px 3px);
+    mix-blend-mode: overlay;
+    animation: scanMove 8s linear infinite;
+  }
+  @keyframes scanMove{from{transform:translateY(-30px)}to{transform:translateY(30px)}}
+
+  .wrap{position:relative;z-index:3;height:100%;display:flex;align-items:center;justify-content:center;padding:18px;}
+  .card{
+    width:min(980px, 100%);
+    background: linear-gradient(180deg, var(--panelA), var(--panelB));
+    border:1px solid rgba(166,176,255,.18);
+    border-radius:22px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.55);
+    overflow:hidden;
+    transform: translateY(10px);
+    opacity:0;
+    animation: cardIn 900ms cubic-bezier(.2,.9,.2,1) forwards;
+  }
+  @keyframes cardIn{to{transform:translateY(0);opacity:1;}}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;
+    background: rgba(10,14,40,.55);
+    border-bottom:1px solid rgba(166,176,255,.12);
+  }
+  .badge{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color: rgba(244,248,255,.78);
+    display:flex;gap:10px;align-items:center;
+  }
+  .dot{width:8px;height:8px;border-radius:99px;background:var(--accent);box-shadow:0 0 14px rgba(74,242,197,.75)}
+  .stamp{font-size:12px;color:rgba(166,176,255,.85)}
+
+  .content{padding:18px;display:grid;grid-template-columns: 1.1fr .9fr;gap:18px;}
+  @media (max-width:860px){.content{grid-template-columns:1fr;}}
+
+  .title{
+    font-size:32px;line-height:1.12;letter-spacing:.02em;
+  }
+  .subtitle{margin-top:6px;color:rgba(166,176,255,.92);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+
+  .panel{
+    margin-top:14px;
+    border:1px solid rgba(166,176,255,.16);
+    border-radius:18px;
+    background: rgba(5,0,20,.22);
+    padding:14px 14px;
+  }
+  .panel h3{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(244,248,255,.78);
+    margin-bottom:10px;
+  }
+
+  .typebox{
+    font-size:15px;line-height:1.75;
+    color:rgba(244,248,255,.92);
+    min-height: 172px;
+    white-space: pre-wrap;
+  }
+  .cursor{display:inline-block;width:10px;animation: blink 1s steps(2,end) infinite;color:var(--accent)}
+  @keyframes blink{50%{opacity:0}}
+
+  .meta{
+    display:flex;flex-wrap:wrap;gap:10px;
+    margin-top:12px;
+  }
+  .chip{
+    font-size:12px;
+    color:rgba(244,248,255,.86);
+    padding:8px 10px;
+    border-radius:999px;
+    background: rgba(166,176,255,.08);
+    border:1px solid rgba(166,176,255,.14);
+  }
+  .chip b{color:var(--gold);font-weight:700}
+
+  .visual{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(166,176,255,.16);
+    background: rgba(0,0,0,.2);
+    min-height: 310px;
+  }
+  .visual::after{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(74,242,197,.14), rgba(0,0,0,0) 55%),
+      linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.05) 55%);
+    pointer-events:none;
+  }
+  .caption{
+    position:absolute;left:14px;right:14px;bottom:12px;
+    color:rgba(244,248,255,.9);
+    font-size:13px;line-height:1.5;
+    text-shadow: 0 10px 30px rgba(0,0,0,.6);
+  }
+  .caption .tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:6px;color:rgba(244,248,255,.78);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+  .caption .tag .warn{width:8px;height:8px;border-radius:99px;background:var(--danger);box-shadow:0 0 14px rgba(255,75,129,.75)}
+
+  /* ✅ epilogue image */
+  .visual.epilogue{
+    background:
+      linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.15) 60%),
+      url("Gemini_Generated_Image_k97l0ck97l0ck97l.png") center/cover no-repeat;
+  }
+
+  .actions{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;
+    border-top:1px solid rgba(166,176,255,.12);
+    background: rgba(10,14,40,.35);
+  }
+  .hint{color:rgba(166,176,255,.9);font-size:13px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap}
+  button,a.btn{
+    appearance:none;border:none;cursor:pointer;
+    padding:10px 14px;border-radius:14px;
+    font-weight:650;
+    letter-spacing:.02em;
+    color:rgba(5,0,20,.95);
+    background: linear-gradient(180deg, rgba(74,242,197,1), rgba(74,242,197,.78));
+    box-shadow: 0 10px 26px rgba(74,242,197,.18);
+    text-decoration:none;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  a.btn.secondary{
+    background: rgba(166,176,255,.12);
+    color: rgba(244,248,255,.9);
+    border:1px solid rgba(166,176,255,.18);
+    box-shadow:none;
+  }
+
+  .fadeout{
+    position:fixed;inset:0;background:#000;z-index:999;
+    opacity:0;pointer-events:none;transition: opacity 650ms ease;
+  }
+  .fadeout.on{opacity:1;pointer-events:auto;}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="vignette"></div>
+<div class="scan"></div>
+<div class="fadeout" id="fade"></div>
+
+<div class="wrap">
+  <div class="card" role="dialog" aria-label="Epilogue">
+    <div class="topbar">
+      <div class="badge"><span class="dot"></span> EPILOGUE · FINAL TRANSMISSION</div>
+      <div class="stamp">MVBDH-1927495 — CONSTANTINOPLE</div>
+    </div>
+
+    <div class="content">
+      <div>
+        <div class="title">콘스탄티노플의 <span style="color:var(--danger);font-weight:800">교황</span>은 마지막으로 고백했다</div>
+        <div class="subtitle">Confession · Termination Protocol</div>
+
+        <div class="panel">
+          <h3>Last Confession</h3>
+          <div class="typebox" id="type"></div><span class="cursor">▍</span>
+          <div class="meta">
+            <div class="chip"><b>상태</b> 요새 붕괴</div>
+            <div class="chip"><b>군체</b> 통제 상실</div>
+            <div class="chip"><b>의도</b> “모든 것을 끝낸다”</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ image panel -->
+      <div class="visual epilogue" aria-label="scene">
+        <div class="caption">
+          <div class="tag"><span class="warn"></span> SIGNAL · UNSTABLE</div>
+          <div>
+            <b>Constantinople Core:</b> 마지막 통신은 내부에서 시작되었다.<br/>
+            그는 승리를 말하지 않았다. 오직 ‘종료’만을 말했을 뿐이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="hint">ENTER를 누르면 기록을 종료합니다.</div>
+      <div class="btns">
+        <a class="btn secondary" href="index.html" onclick="return navWithFade(event, this.href)">프롤로그</a>
+        <a class="btn" href="index.html" onclick="return navWithFade(event, this.href)">종료</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Starfield
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  let W=0,H=0,DPR=1;
+  const stars=[];
+
+  function resize(){
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    c.width = Math.floor(W*DPR); c.height = Math.floor(H*DPR);
+    c.style.width = W+'px'; c.style.height = H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    stars.length = 0;
+    const n = Math.floor(Math.min(420, (W*H)/4200));
+    for(let i=0;i<n;i++){
+      stars.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        r: Math.random()*1.5 + 0.2,
+        v: Math.random()*0.18 + 0.03,
+        a: Math.random()*0.75 + 0.15
+      });
+    }
+  }
+  window.addEventListener('resize', resize, {passive:true});
+  resize();
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      s.y += s.v;
+      if(s.y > H + 5) { s.y = -5; s.x = Math.random()*W; }
+      ctx.globalAlpha = s.a;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // Typewriter epilogue
+  const lines = [
+    "[내부 기록] 콘스탄티노플 중앙 성소 — 최종 자백",
+    "",
+    "나는 ‘교황’이라 불렸다.",
+    "나는 사람들에게 약속했다. 우리에게는 다음 단계가 있다고.",
+    "",
+    "처음에는 단지 ‘가속’이었다.",
+    "군체의 세대를 줄이고, 환경 적응을 앞당기고,",
+    "인간의 약함을 덜어내면—우리는 살아남을 수 있다고 믿었다.",
+    "",
+    "그러나 진화는 명령을 듣지 않았다.",
+    "군체는 스스로 규칙을 만들었고,",
+    "우리는 그 규칙에 ‘신의 이름’을 붙였을 뿐이다.",
+    "",
+    "나는 많은 사람을 ‘진화’시켰다.",
+    "그리고 그들이 더 이상 사람으로 돌아올 수 없다는 걸,",
+    "너무 늦게 깨달았다.",
+    "",
+    "지금 요새는 무너지고 있다.",
+    "전선은 성소까지 들어왔다.",
+    "",
+    "나는 더 이상 변명하지 않는다.",
+    "이 행성에서 시작된 모든 일을, 여기서 끝내겠다.",
+    "",
+    "콘스탄티노플의 핵을 멈춘다.",
+    "군체 네트워크를 끊는다.",
+    "",
+    "내가 만든 것들과 함께—나도 사라진다.",
+    "",
+    "…만약 이것이 죄의 값이라면,",
+    "지금이 지불할 시간이다."
+  ];
+
+  const el = document.getElementById('type');
+  const t = lines.join('\\n');
+  let i = 0;
+  function type(){
+    const speed = (t[i] === '\\n') ? 18 : 22;
+    el.textContent = t.slice(0, i+1);
+    i++;
+    if(i < t.length) setTimeout(type, speed);
+  }
+  setTimeout(type, 350);
+
+  // Fade navigation
+  const fade = document.getElementById('fade');
+  function navWithFade(ev, href){
+    if(ev) ev.preventDefault();
+    fade.classList.add('on');
+    setTimeout(()=>{ location.href = href; }, 680);
+    return false;
+  }
+  window.navWithFade = navWithFade;
+
+  // Enter to exit
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      const a = document.querySelector('a.btn[href="index.html"]');
+      if(a) navWithFade(e, a.href);
+    }
+  });
+</script>
+</body>
+</html>
