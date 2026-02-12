@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StarShield 4 : Constantinople — Prologue</title>
+
+<style>
+:root{
+  --bg:#050014;
+  --text:#f4f8ff;
+  --sub:#a6b0ff;
+  --accent:#4af2c5;
+  --danger:#ff4b81;
+  --gold:#ffd166;
+  --panelA: rgba(8,12,34,.92);
+  --panelB: rgba(6,8,24,.92);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+html,body{height:100%}
+body{
+  background: radial-gradient(circle at 18% 12%, #1b1f58 0%, #07001b 45%, #03000c 100%);
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* mobile */
+@media (max-width: 860px), (max-height: 740px){
+  body{overflow:auto;-webkit-overflow-scrolling:touch;}
+  .wrap{align-items:flex-start; padding:14px 12px 28px; height:auto; min-height:100%;}
+  .card{margin-top:12px; margin-bottom:24px;}
+}
+
+/* background */
+#stars{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;}
+.vignette{position:fixed;inset:-20%;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(0,0,0,0) 0 35%, rgba(0,0,0,.55) 60%, rgba(0,0,0,.92) 100%),
+    radial-gradient(circle at 80% 10%, rgba(74,242,197,.12) 0, rgba(0,0,0,0) 55%);
+}
+.scan{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.08;
+  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.15) 0 1px, rgba(0,0,0,0) 1px 3px);
+  mix-blend-mode: overlay;
+  animation: scanMove 8s linear infinite;
+}
+@keyframes scanMove{from{transform:translateY(-30px)}to{transform:translateY(30px)}}
+
+.wrap{position:relative;z-index:3;height:100%;display:flex;align-items:center;justify-content:center;padding:18px;}
+.card{
+  width:min(980px, 100%);
+  background: linear-gradient(180deg, var(--panelA), var(--panelB));
+  border:1px solid rgba(166,176,255,.18);
+  border-radius:22px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  overflow:hidden;
+  transform: translateY(10px);
+  opacity:0;
+  animation: cardIn 900ms cubic-bezier(.2,.9,.2,1) forwards;
+}
+@keyframes cardIn{to{transform:translateY(0);opacity:1;}}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background: rgba(10,14,40,.55);
+  border-bottom:1px solid rgba(166,176,255,.12);
+}
+.badge{
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color: rgba(244,248,255,.78);
+  display:flex;gap:10px;align-items:center;
+}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--accent);box-shadow:0 0 14px rgba(74,242,197,.75)}
+.stamp{font-size:12px;color:rgba(166,176,255,.85)}
+
+.content{padding:18px;display:grid;grid-template-columns: 1.1fr .9fr;gap:18px;}
+@media (max-width:860px){.content{grid-template-columns:1fr;}}
+
+.title{font-size:32px;line-height:1.12;letter-spacing:.02em;}
+.subtitle{margin-top:6px;color:rgba(166,176,255,.92);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+
+.panel{
+  margin-top:14px;
+  border:1px solid rgba(166,176,255,.16);
+  border-radius:18px;
+  background: rgba(5,0,20,.22);
+  padding:14px;
+}
+.panel h3{
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(244,248,255,.78);
+  margin-bottom:10px;
+}
+.typebox{
+  font-size:15px;line-height:1.75;
+  color:rgba(244,248,255,.92);
+  min-height: 172px;
+  white-space: pre-wrap;
+}
+.cursor{display:inline-block;width:10px;animation: blink 1s steps(2,end) infinite;color:var(--accent)}
+@keyframes blink{50%{opacity:0}}
+
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+.chip{
+  font-size:12px;color:rgba(244,248,255,.86);
+  padding:8px 10px;border-radius:999px;
+  background: rgba(166,176,255,.08);
+  border:1px solid rgba(166,176,255,.14);
+}
+.chip b{color:var(--gold)}
+
+/* right visual */
+.visual{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(166,176,255,.16);
+  background: rgba(0,0,0,.2);
+  min-height: 310px;
+}
+.visual::after{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(74,242,197,.14), rgba(0,0,0,0) 55%),
+    linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.05) 55%);
+  pointer-events:none;
+}
+.caption{
+  position:absolute;left:14px;right:14px;bottom:12px;
+  color:rgba(244,248,255,.9);
+  font-size:13px;line-height:1.5;
+  text-shadow: 0 10px 30px rgba(0,0,0,.6);
+}
+.caption .tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:6px;color:rgba(244,248,255,.78);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.caption .tag .warn{width:8px;height:8px;border-radius:99px;background:var(--danger);box-shadow:0 0 14px rgba(255,75,129,.75)}
+
+/* ✅ prologue image */
+.visual.prologue{
+  background:
+    linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.15) 60%),
+    url("Gemini_Generated_Image_fwr78afwr78afwr7.png") center/cover no-repeat;
+}
+
+.actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  border-top:1px solid rgba(166,176,255,.12);
+  background: rgba(10,14,40,.35);
+}
+.hint{color:rgba(166,176,255,.9);font-size:13px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+button,a.btn{
+  appearance:none;border:none;cursor:pointer;
+  padding:10px 14px;border-radius:14px;
+  font-weight:650;
+  color:rgba(5,0,20,.95);
+  background: linear-gradient(180deg, rgba(74,242,197,1), rgba(74,242,197,.78));
+  text-decoration:none;
+}
+a.btn.secondary{
+  background: rgba(166,176,255,.12);
+  color: rgba(244,248,255,.9);
+  border:1px solid rgba(166,176,255,.18);
+}
+
+.fadeout{position:fixed;inset:0;background:#000;z-index:999;opacity:0;transition:.65s}
+.fadeout.on{opacity:1}
+</style>
+</head>
+
+<body>
+<canvas id="stars"></canvas>
+<div class="vignette"></div>
+<div class="scan"></div>
+<div class="fadeout" id="fade"></div>
+
+<div class="wrap">
+<div class="card">
+  <div class="topbar">
+    <div class="badge"><span class="dot"></span> PROLOGUE · CLASSIFIED BRIEF</div>
+    <div class="stamp">UNITED STATES SPACE COMMAND</div>
+  </div>
+
+  <div class="content">
+    <div>
+      <div class="title">
+        미합중국은 <span style="color:var(--danger);font-weight:800">비인가 진화 요새</span>의 존재를 확인했다
+      </div>
+      <div class="subtitle">MVBDH-1927495 · CONSTANTINOPLE</div>
+
+      <div class="panel">
+        <h3>Situation Report</h3>
+        <div class="typebox" id="type"></div><span class="cursor">▍</span>
+        <div class="meta">
+          <div class="chip"><b>전장</b> MVBDH-1927495</div>
+          <div class="chip"><b>적 요새</b> 콘스탄티노플</div>
+          <div class="chip"><b>분류</b> 생체 진화 위협</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ image panel -->
+    <div class="visual prologue" aria-label="scene">
+      <div class="caption">
+        <div class="tag"><span class="warn"></span> RECON · CONFIRMED</div>
+        <div>
+          <b>Constantinople:</b> 비인가 집단이 건설한 요새 도시.<br/>
+          군체 변이와 인간 자가개조가 확인되었다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="hint">ENTER 키를 눌러 작전을 개시합니다.</div>
+    <div class="btns">
+      <a class="btn" href="ss.html" onclick="nav(event,'ss.html')">전투 시작</a>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const lines = [
+  "[기밀] 미합중국 우주사령부 — 합동 위기 평가",
+  "",
+  "MVBDH-1927495는 외곽 항로의 무명 행성이었다.",
+  "초기 탐사 결과, 고등 문명은 확인되지 않았다.",
+  "",
+  "그러나 비인가 종교 집단이 상륙한 이후 상황은 급변했다.",
+  "그들은 행성 중심부에 요새 도시를 건설했고,",
+  "그 명칭을 ‘콘스탄티노플’이라 불렀다.",
+  "",
+  "곤충 군체는 변이했다.",
+  "개체는 커지고, 공격적이 되었으며,",
+  "집단 단위로 전선을 형성하기 시작했다.",
+  "",
+  "동시에 인간 신도들은 스스로를 개조했다.",
+  "그들은 이것을 ‘진화’라 불렀다.",
+  "",
+  "미합중국은 이를 생체 병기 개발로 규정한다.",
+  "외교적 해결은 불가능하다.",
+  "",
+  "당신은 선봉 지휘관이다.",
+  "전선을 형성하고, 요새를 돌파하라.",
+  "",
+  "이 행성에서 벌어진 일은",
+  "반드시 여기서 끝나야 한다."
+];
+
+const el=document.getElementById("type");
+let i=0, t=lines.join("\\n");
+(function type(){
+  el.textContent=t.slice(0,++i);
+  if(i<t.length) setTimeout(type, t[i]==="\\n"?18:22);
+})();
+
+function nav(e,href){
+  e.preventDefault();
+  document.getElementById("fade").classList.add("on");
+  setTimeout(()=>location.href=href,650);
+}
+
+window.addEventListener("keydown",e=>{if(e.key==="Enter") nav(e,"ss.html")});
+
+/* optional starfield (lightweight) */
+(function(){
+  const c = document.getElementById('stars');
+  const g = c.getContext('2d');
+  let W=0,H=0,DPR=1;
+  const s=[];
+  function resize(){
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    c.width = Math.floor(W*DPR); c.height = Math.floor(H*DPR);
+    c.style.width = W+'px'; c.style.height = H+'px';
+    g.setTransform(DPR,0,0,DPR,0,0);
+    s.length = 0;
+    const n = Math.floor(Math.min(420, (W*H)/4200));
+    for(let i=0;i<n;i++){
+      s.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.2,v:Math.random()*.18+.03,a:Math.random()*.75+.15});
+    }
+  }
+  window.addEventListener('resize', resize, {passive:true});
+  resize();
+  (function tick(){
+    g.clearRect(0,0,W,H);
+    for(const st of s){
+      st.y += st.v;
+      if(st.y > H + 5){ st.y = -5; st.x = Math.random()*W; }
+      g.globalAlpha = st.a;
+      g.beginPath(); g.arc(st.x, st.y, st.r, 0, Math.PI*2);
+      g.fillStyle = '#ffffff'; g.fill();
+    }
+    g.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>
