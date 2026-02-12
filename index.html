@@ -164,8 +164,12 @@ a.btn.secondary{
   border:1px solid rgba(166,176,255,.18);
 }
 
-.fadeout{position:fixed;inset:0;background:#000;z-index:999;opacity:0;transition:.65s}
-.fadeout.on{opacity:1}
+.fadeout{
+  position:fixed; inset:0; background:#000; z-index:999;
+  opacity:0; pointer-events:none; transition:opacity .65s;
+}
+.fadeout.on{ opacity:1; pointer-events:auto; }
+
 </style>
 </head>
 
